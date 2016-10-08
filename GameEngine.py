@@ -199,7 +199,7 @@ class GameEngine:
             for coor in nearbyCoordinates:
                 otherUnit = self.gridUnits[coor[0]][coor[1]]
                 if (otherUnit != C.EMPTY and otherUnit.GetPlayerID() != unit.GetPlayerID()):
-                    print(r,c,unit.GetPlayerID(),"VS",coor[0],coor[1],otherUnit.GetPlayerID())
+                    # print(r,c,unit.GetPlayerID(),"VS",coor[0],coor[1],otherUnit.GetPlayerID())
                     enemyCount+=1
             self.gridUnitEnemyScore[r][c] = enemyCount
 
@@ -210,7 +210,7 @@ class GameEngine:
             r = unit.GetRow()
             c = unit.GetCol()
             unitEnemyScore = self.gridUnitEnemyScore[r][c]
-            print ("unit of player", unit.GetPlayerID(),"at",r,c,"Score=",unitEnemyScore)
+            # print ("unit of player", unit.GetPlayerID(),"at",r,c,"Score=",unitEnemyScore)
             if (unitEnemyScore == 0):
                 continue
             nearbyCoordinates = Helper.GetAllWithinDistance(r,c,C.ATTACK_RANGE)
@@ -245,7 +245,7 @@ class GameEngine:
     # Deletes a unit with ID unitId from unitDictionary.
     # NOTE: Run ResetGridUnits after killing any unit to update the grid!
     def KillUnit(self, unitId):
-        print("Kill unitID", unitId)
+        # print("Kill unitID", unitId)
         killedUnit = self.unitDictionary.pop(unitId, None)
         return killedUnit!=None
 
