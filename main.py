@@ -139,5 +139,5 @@ if __name__ == "__main__":
     global GE
     GE = GameEngine(30, 30, 2)
     app = make_app()
-    app.listen(8888)
+    app.listen(options.port)
     tornado.ioloop.IOLoop.current().start()
