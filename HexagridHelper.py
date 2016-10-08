@@ -7,11 +7,17 @@
 #    [3,0] [3,1] [3,2] [3,3] [3,4]
 # [4,0] [4,1] [4,2] [4,3] [4,4]
 
-# Movement naming Convention
+# Movement constants
 #  [UL] [UR]
 # [L] [I] [R]
 #  [DL] [DR]
-# I = 0, R..UR = 1..6 in clockwise order
+I = 0
+R = 1
+DR = 2
+DL = 3
+L = 4
+UL = 5
+UR = 6
 
 import GameConstant
 
