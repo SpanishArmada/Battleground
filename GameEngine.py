@@ -163,10 +163,12 @@ class GameEngine:
             try:
                 self.playerMovements[i] = self.playerObject[i].getAction(i, gridTerrainPlayer[i], gridUnitsPlayer[i], self.memoryList[i])
             except:
+                e = sys.exc_info()[0]
+                print(e)
                 self.playerMovements[i] = []
                 for key, unit in self.unitDictionary.items():
                     if(key == i):
-                        self.playerMovements[i].append(Movement(unit.GetUnitID(),IDLE))
+                        self.playerMovements[i].append(Movement(unit.GetUnitID(),C.IDLE))
 
     # Movement phase, handles all the outputs of players' scripts and moves units concurrently
     # Any collision will cause all units in the tile to die
