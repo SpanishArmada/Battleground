@@ -6,7 +6,8 @@ from GameConstant import GameConstant as C
 from JSONDumper import JSONDumper
 import HexagridHelper as Helper
 import copy as copy
-
+from os.path import isfile, join, dirname, splitext, abspath, split
+import imp, importlib
 class GameEngine:
 
     # Init function
@@ -26,8 +27,28 @@ class GameEngine:
 
         self.jsonDumper = JSONDumper()
 
+
+    def LoadFromFile(self, filepath, expectedClass):
+        class_inst = None
+
+        mod_name,file_ext = splitext(split(filepath)[-1])
+
+        if file_ext.lower() == '.py':
+            py_mod = imp.load_source(mod_name, filepath)
+
+        elif file_ext.lower() == '.pyc':
+            py_mod = imp.load_compiled(mod_name, filepath)
+
+        if hasattr(py_mod, expectedClass):
+            class_inst = getattr(py_mod, expectedClass)()
+
+        return class_inst
+
     # Function to be called. Simulates the game and returns the json dump
     def Start(self, gridTerrain, playerObject):
+        path = dirname(abspath(__file__)) + '\\' + "algo" + '\\'
+        playerObject[0] = self.LoadFromFile(path + playerObject[0], playerObject[0][:-3])
+        playerObject[1] = self.LoadFromFile(path + playerObject[1], playerObject[1][:-3])
         self.ReadTerrain(gridTerrain)
         self.jsonDumper.InitializeMap(gridTerrain)
         self.playerObject = playerObject
@@ -63,12 +84,12 @@ class GameEngine:
         playerLeft = C.EMPTY
 
         for hive in self.hiveList:
-            curID = hive.getPlayerID()
+            curID = hive.GetPlayerID()
             if(playerLeft == C.EMPTY):
                 playerLeft = curID
                 continue
 
-            if(curID != playerLeft and curID ! = C.EMPTY):
+            if(curID != playerLeft and curID != C.EMPTY):
                 return False
 
         for key, unit in self.unitDictionary.items():
@@ -101,7 +122,7 @@ class GameEngine:
     def ResetGridUnits(self):
         self.gridUnits = [[C.EMPTY for i in range(self.col)] for j in range(self.row)]
         for key, unit in self.unitDictionary.items():
-            self.gridUnits[unit.GetRow][unit.GetCol] = unit
+            self.gridUnits[unit.GetRow()][unit.GetCol()] = unit
 
     # Calculates each player's fog of war
     def CalculateFoW(self):
@@ -137,27 +158,27 @@ class GameEngine:
     # Movement phase, handles all the outputs of players' scripts and moves units concurrently
     # Any collision will cause all units in the tile to die
     def MovementPhase(self):
-        isDeathMatrix = [[0 for i in range(self.col)] in range(self.row)]
+        isDeathMatrix = [[0 for i in range(self.col)] for j in range(self.row)]
 
         for i in range(self.playerNum):
             for mov in self.playerMovements[i]:
-                if(self.unitDictionary.has_key(mov.getUnitID)):
-                    curUnit = self.unitDictionary[mov.getUnitID()]
+                if(mov.GetUnitID() in self.unitDictionary.keys()):
+                    curUnit = self.unitDictionary[mov.GetUnitID()]
                     oRow = curUnit.GetRow()
                     oCol = curUnit.GetCol()
                     if(curUnit.GetPlayerID() == i):
-                        nCoor = Helper.GetMoveTarget(oRow, oCol, mov.getMove())
+                        nCoor = Helper.GetMoveTarget(oRow, oCol, mov.GetMove())
                         if(self.IsValidCoordinate(nCoor[0], nCoor[1]) and self.gridTerrainMain[nCoor[0]][nCoor[1]] != C.WALL):
                             curUnit.SetRow(nCoor[0])
                             curUnit.SetCol(nCoor[1])
         
         # check collision
         for key, curUnit in self.unitDictionary.items():
-            if(isDeathMatrix[curUnit.GetRow][curUnit.GetCol] == 0):
-                isDeathMatrix[curUnit.GetRow][curUnit.GetCol] == curUnit.getUnitID()
+            if(isDeathMatrix[curUnit.GetRow()][curUnit.GetCol()] == 0):
+                isDeathMatrix[curUnit.GetRow()][curUnit.GetCol()] == curUnit.GetUnitID()
             else:
-                self.KillUnit(curUnit.getUnitID())
-                self.KillUnit(isDeathMatrix[curUnit.GetRow][curUnit.GetCol])
+                self.KillUnit(curUnit.GetUnitID())
+                self.KillUnit(isDeathMatrix[curUnit.GetRow()][curUnit.GetCol()])
         
         # place on a new map
         self.ResetGridUnits()
@@ -188,7 +209,7 @@ class GameEngine:
         for r in range(self.row):
             for c in range(self.col):
                 unit = self.gridUnits[r][c]
-                unitEnemyScore = self.gridUnitEnemyScore[r],[c]
+                unitEnemyScore = self.gridUnitEnemyScore[r][c]
                 if (unit != C.EMPTY):
                     nearbyCoordinates = Helper.GetAllWithinDistance(r,c,C.ATTACK_RANGE)
                     minEnemyScore = 100
@@ -198,14 +219,15 @@ class GameEngine:
                         if (otherUnit != C.EMPTY and otherUnit.playerID != unit.playerID):
                             minEnemyScore = min(minEnemyScore, otherUnitEnemyScore)
 
-                    self.gridUnitDeathMark[r][c] = minEnemyScore <= unitEnemyScore
+                    if (minEnemyScore <= unitEnemyScore):
+                        self.gridUnitDeathMark[r][c] = 1
 
     # Apply all death marks to units
     def ApplyDeath(self):
         for r in range(self.row):
             for c in range(self.col):
                 unit = self.gridUnits[r][c]
-                if (unit != C.EMPTY and self.gridUnitDeathMark[r][c]):
+                if (unit != C.EMPTY and self.gridUnitDeathMark[r][c] == 1):
                     self.KillUnit(unit.GetUnitID)
         self.ResetGridUnits()
 
@@ -236,8 +258,8 @@ class GameEngine:
                 unitOnTop = self.gridUnits[hive.GetRow()][hive.GetCol()]
 
                 if(unitOnTop != C.EMPTY):
-                    if(unitOnTop.GetPlayerID != hive.GetPlayerID):
-                        hive.SetNewPlayer(unitOnTop.GetPlayerID)
+                    if(unitOnTop.GetPlayerID() != hive.GetPlayerID()):
+                        hive.SetNewPlayer(unitOnTop.GetPlayerID())
                         continue
                     else:
                         freeOnTop = False
@@ -245,7 +267,7 @@ class GameEngine:
                     freeOnTop = True
                 
                 if(hive.IncrTimer(freeOnTop)):
-                    self.AddUnit(hive.GetPlayerID, hive.GetRow(), hive.GetCol())
+                    self.AddUnit(hive.GetPlayerID(), hive.GetRow(), hive.GetCol())
 
 
     # Updates the JSON every turn with the turn's arena status

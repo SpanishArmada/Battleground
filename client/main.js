@@ -1,6 +1,33 @@
 "use strict";
 
 /* http://stackoverflow.com/a/14388512 */
+var replayData = null;
+var ws = new WebSocket("ws://localhost:8888/ws");
+        var client_id;
+        console.log("INSIDE simulation")
+        ws.onopen = function() {
+            console.log("Connection open")
+            ws.send(JSON.stringify({type: 3}));
+        };
+        ws.onmessage = function (evt) {
+            console.log(evt)
+            console.log(evt.data)
+            var data = JSON.parse(evt.data);
+            if(data.type == 0) {
+                client_id = data.client_id; 
+            }
+            if(data.type == 1) {
+                replayData = JSON.parse(data.jsonData)
+                playReplay()
+            }
+        };
+
+        window.onbeforeunload = function() {
+            ws.send(JSON.stringify({type: 1, client_id: client_id}));
+            ws.onclose = function () {}; // disable onclose handler first
+            ws.close()
+        };
+
 var fetchJSONFile = function (path, callback) {
     var httpRequest = new XMLHttpRequest();
     httpRequest.onreadystatechange = function() {
@@ -79,27 +106,27 @@ var resolution = [
 ]
 
 var perspective = -1;
-var replayData = {
-    map: [[0,0,0,0], [0,0,0,0], [0,0,0,0], [0,0,0,0]],
-    turnData: [
-        {
-            unitData: [],
-            baseData: [[0,0,0],[3,3,1],[3,0,-1],[0,3,-1]],
-        },
-        {
-            unitData: [[0,0,0],[3,3,1]],
-            baseData: [[0,0,0],[3,3,1],[3,0,-1],[0,3,-1]],
-        },
-        {
-            unitData: [[0,1,0],[3,2,1]],
-            baseData: [[0,0,0],[3,3,1],[3,0,-1],[0,3,-1]],
-        },
-        {
-            unitData: [[1,0,0],[3,1,1],[0,0,0],[3,3,1]],
-            baseData: [[0,0,0],[3,3,1],[3,0,-1],[0,3,-1]],
-        },
-    ]
-};
+// var replayData = {
+//     map: [[0,0,0,0], [0,0,0,0], [0,0,0,0], [0,0,0,0]],
+//     turnData: [
+//         {
+//             unitData: [],
+//             baseData: [[0,0,0],[3,3,1],[3,0,-1],[0,3,-1]],
+//         },
+//         {
+//             unitData: [[0,0,0],[3,3,1]],
+//             baseData: [[0,0,0],[3,3,1],[3,0,-1],[0,3,-1]],
+//         },
+//         {
+//             unitData: [[0,1,0],[3,2,1]],
+//             baseData: [[0,0,0],[3,3,1],[3,0,-1],[0,3,-1]],
+//         },
+//         {
+//             unitData: [[1,0,0],[3,1,1],[0,0,0],[3,3,1]],
+//             baseData: [[0,0,0],[3,3,1],[3,0,-1],[0,3,-1]],
+//         },
+//     ]
+// };
 
 var inBoundary = function (row, col) {
     return 0 <= row && row < mapHeight
@@ -314,5 +341,5 @@ document.addEventListener('DOMContentLoaded', function (event) {
     // test.draw();
     // test.unitMovementDraw();
     // drawMap();
-    playReplay();
+    // playReplay();
 })

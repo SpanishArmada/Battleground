@@ -8,10 +8,13 @@ class test:
         results = []
         counter = 0
         for i in units:
-            if i.GetUnitID() == pid:
-                if(counter % 2 == 0):
-                    results.append(Movement(pid, RIGHT))
-                else:
-                    results.append(Movement(pid, UPPERRIGHT))
-                counter += 1
+            for j in i:
+                if(isinstance(j, int)):
+                    continue
+                if j.GetUnitID() == pid:
+                    if(counter % 2 == 0):
+                        results.append(Movement(pid, RIGHT))
+                    else:
+                        results.append(Movement(pid, UPPERRIGHT))
+                    counter += 1
         return results

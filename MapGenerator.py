@@ -17,8 +17,8 @@ def addFort(grids, row, col, gateSize, opening):
     for i in range(top, bot + 1):
         grids[i][right] = C.WALL
         grids[i][left] = C.WALL
-    opening = (opening - 1) / 2
-    direction = [[top, col], [row, right], [bot, col], [row, left]]
+    # opening = (opening - 1) / 2
+    # direction = [[top, col], [row, right], [bot, col], [row, left]]
     # for i in 
     grids[top][col] = grids[bot][col] = C.NON_WALL
     grids[row][right] = grids[row][left] = C.NON_WALL
@@ -181,5 +181,5 @@ def getMap2(row, col):
     addPlus(grids, 4, col - 13, 9)
     addPlus(grids, row - 13, 4, 9)
     addPlus(grids, row - 13, col - 13, 9)
-    addFort(grids, getPercentile(0, row, 0.5), getPercentile(0, col, 0.5))
+    addFort(grids, getPercentile(0, row, 0.5), getPercentile(0, col, 0.5), 1, [1, 1, 1, 1])
     return grids

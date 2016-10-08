@@ -8,11 +8,14 @@ import uuid, subprocess
 from os import listdir
 from os.path import isfile, join, dirname, splitext, abspath, split
 import imp, importlib
+from GameEngine import GameEngine
+from MapGenerator import *
 
 clients = []
 algoList = []
 server = None
 counter = 0
+GE = None
 path = dirname(abspath(__file__)) + '\\' + "algo" + '\\'
 def load_from_file(filepath, expectedClass):
     class_inst = None
@@ -78,6 +81,7 @@ class SocketHandler(tornado.websocket.WebSocketHandler):
 
 
     def on_message(self, msg):
+        global algoList
         incoming_data = json.loads(msg)
         msg_type = incoming_data["type"]
         if(msg_type == 0):
@@ -95,9 +99,8 @@ class SocketHandler(tornado.websocket.WebSocketHandler):
             data = {"type": 1, "algoList": algoList}
             self.write_message(data)
         elif(msg_type == 3):
-            # call function with algoList as parameter here
-            result = 0
-            data = {"type": 1, "algoList": result}
+            result = GE.Start(getMap2(30, 30), algoList)
+            data = {"type": 1, "jsonData": result}
             self.write_message(data)
 
     def on_close(self):
@@ -109,12 +112,9 @@ class Simulate(tornado.web.RequestHandler):
         algo1 = self.get_body_argument("algo1", default=None, strip=False)
         algo2 = self.get_body_argument("algo2", default=None, strip=False)
 
-        f = load_from_file(path + algo1, algo1[:-3])
-        f1 = load_from_file(path + algo2, algo2[:-3])
-        algoList.append(f)
-        algoList.append(f1)
-        print(f.getAction([5, 5]))
-        print(f1.getAction([5, 5]))
+        
+        algoList.append(algo1)
+        algoList.append(algo2)
         self.render("client/index.html")
 
 class SkipUpload(tornado.web.RequestHandler):
@@ -133,11 +133,11 @@ def make_app():
         (r"/skipUpload", SkipUpload),
     ], **settings)
 
-def update_client():
-    pass
 
 
 if __name__ == "__main__":
+    global GE
+    GE = GameEngine(30, 30, 2)
     app = make_app()
     app.listen(8888)
     tornado.ioloop.IOLoop.current().start()

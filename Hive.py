@@ -30,15 +30,15 @@ class Hive:
     def SetNewPlayer(self, playerID):
         if(self.playerID != playerID):
             self.playerID = playerID
-            resetTimer()
+            self.ResetTimer()
 
     def IncrTimer(self, freeOnTop):
         self.hiveTimer += 1
         if(self.hiveTimer >= GameConstant.RESPAWN and freeOnTop):
-            resetTimer()
-            return true
+            self.ResetTimer()
+            return True
         else:
-            return false
+            return False
 
     def ResetTimer(self):
         self.hiveTimer = 0;

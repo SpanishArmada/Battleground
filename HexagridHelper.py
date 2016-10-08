@@ -39,7 +39,7 @@ def GetAllWithinDistance(sourceRow, sourceCol, distance):
         newList = []
         for coor in coorList:
             for dir in range(0,7):
-                newList.append(GetDirectionTarget(coor[0],coor[1],dir))
+                newList.append(GetMoveTarget(coor[0],coor[1],dir))
         coorList = list(set(newList))
     return coorList
 
