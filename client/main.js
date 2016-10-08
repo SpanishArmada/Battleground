@@ -56,7 +56,6 @@ var hiveProperties = {
 var mapWidth = 50;
 var mapHeight = 50;
 var map = [];
-console.assert(mapWidth % 2 === 0, 'mapWidth in testDraw(mapWidth, mapHeight) is not an even number');
 
 var directions = ['ne', 'e', 'se','sw', 'w', 'nw'];
 var resolution = [
