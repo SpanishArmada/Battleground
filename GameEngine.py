@@ -2,6 +2,7 @@
 
 from Unit import Unit
 from Hive import Hive
+from Movement import Movement
 from GameConstant import GameConstant as C
 from JSONDumper import JSONDumper
 import HexagridHelper as Helper
@@ -159,7 +160,13 @@ class GameEngine:
         # execute ai for each player
         # store player movement
         for i in range(self.playerNum):
-            self.playerMovements[i] = self.playerObject[i].getAction(i, gridTerrainPlayer[i], gridUnitsPlayer[i], self.memoryList[i])
+            try:
+                self.playerMovements[i] = self.playerObject[i].getAction(i, gridTerrainPlayer[i], gridUnitsPlayer[i], self.memoryList[i])
+            except:
+                self.playerMovements[i] = []
+                for key, unit in self.unitDictionary.items():
+                    if(key == i):
+                        self.playerMovements[i].append(Movement(unit.GetUnitID(),IDLE))
 
     # Movement phase, handles all the outputs of players' scripts and moves units concurrently
     # Any collision will cause all units in the tile to die
