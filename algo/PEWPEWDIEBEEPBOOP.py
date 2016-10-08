@@ -27,15 +27,15 @@ class PEWPEWDIEBEEPBOOP:
             'nw': (-1, -1),
             'w': (0, -1),
             'sw': (1, -1),
-        },
-        {
+            },
+            {
             'ne': (-1, 1),
             'e': (0, 1),
             'se': (1, 1),
             'nw': (-1, 0),
             'w': (0, -1),
             'sw': (1, 0),
-        }]
+            }]
         direction_mapper = {
             'na': IDLE,
             'ne': UPPERRIGHT,
@@ -59,6 +59,7 @@ class PEWPEWDIEBEEPBOOP:
             if in_boundary(new_row, new_col):
                 return (new_row, new_col)
             else: return (row, col)
+
 
         heatmap = []
         width, height = memory['size']
@@ -84,8 +85,6 @@ class PEWPEWDIEBEEPBOOP:
                         ours.append((row, col))
                     else:
                         theirs.append((row, col))
-                else: # Unexplored!
-                    unexplored.add((row, col))
 
                 u = units[row][col]
                 if not isinstance(u, int): # Is not a unit!
@@ -93,6 +92,9 @@ class PEWPEWDIEBEEPBOOP:
                         us.append((row, col, u.GetUnitID() ))
                     else:
                         them.append((row, col))
+
+                if explored[row][col] == -1:
+                    unexplored.add((row, col))
         def _(x, denominator):
             return math.exp(-x**2./denominator)
         # Capture all freebies
