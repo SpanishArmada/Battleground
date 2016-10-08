@@ -127,14 +127,19 @@ class GameEngine:
     # Calculates each player's fog of war
     def CalculateFoW(self):
         # generate map for each player
-        for i in range(self.row):
-            for j in range(self.col):
-                tmpUnit = self.gridUnits[i][j]
-                if(tmpUnit != C.EMPTY):
-                    listViewed = Helper.GetAllWithinDistance(i, j, C.VISION_RANGE)
-                    for coor in listViewed:
-                        if(self.IsValidCoordinate(coor[0],coor[1])):
-                            self.gridFoW[tmpUnit.GetPlayerID()][coor[0]][coor[1]] = C.REVEALED
+        for key, tmpUnit in self.unitDictionary.items():
+            if(tmpUnit != C.EMPTY):
+                listViewed = Helper.GetAllWithinDistance(tmpUnit.GetRow(), tmpUnit.GetCol(), C.VISION_RANGE)
+                for coor in listViewed:
+                    if(self.IsValidCoordinate(coor[0],coor[1])):
+                        self.gridFoW[tmpUnit.GetPlayerID()][coor[0]][coor[1]] = C.REVEALED
+        
+        for hive in self.hiveList:
+            if(hive.GetPlayerID() != C.EMPTY):
+                listViewed = Helper.GetAllWithinDistance(hive.GetRow(), hive.GetCol(), C.VISION_RANGE)
+                for coor in listViewed:
+                    if(self.IsValidCoordinate(coor[0],coor[1])):
+                        self.gridFoW[hive.GetPlayerID()][coor[0]][coor[1]] = C.REVEALED
 
     # Runs each player's AI function
     def RunAI(self):
