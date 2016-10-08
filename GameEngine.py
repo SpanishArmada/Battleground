@@ -5,6 +5,7 @@ from Unit import Unit
 from Hive import Hive
 from GameConstant import GameConstant as C
 import HexagridHelper as Helper
+import copy as copy
 
 class GameEngine:
 
@@ -58,16 +59,22 @@ class GameEngine:
                             self.gridFoW[tmpUnit.GetPlayerID()][coor[0]][coor[1]] = C.REVEALED
     
     def RunAI(self):
-        # calculate parameters to pass
         gridUnitsPlayer = [[[C.EMPTY for i in range(self.col)] for j in range(self.row)] k in range(self.playerNum)]
-        gridTerraiMain = [[[C.EMPTY for i in range(self.col)] for j in range(self.row)] k in range(self.playerNum)]
-
+        gridTerrainPlayer = [[[C.EMPTY for i in range(self.col)] for j in range(self.row)] k in range(self.playerNum)]
+        
+         # calculate parameters to pass
         for i in range(self.playerNum):
             for j in range(self.row):
                 for k in range(self.col):
-                    if(self.gridFoW[i][j][k] == 1)
+                    if(self.gridFoW[i][j][k] == REVEALED):
+                        gridUnitsPlayer[i][j][k] = copy.deepcopy(self.gridUnits[j][k])
+                        gridTerrainPlayer[i][j][k] = copy.deepcopy(self.gridTerrainMain[j][k])
+
         # execute ai for each player
-        # store movement
+        # store player movement
+        for i in range(self.playerNum):
+            self.playerMovements[i] = playerObject[i].getAction(gridUnitsPlayer[i], gridTerrainPlayer[i], memoryList[i])
+
 
     def MovementPhase(self):
         isDeathMatrix = [[0 for i in range(self.col)] in range(self.row)]
