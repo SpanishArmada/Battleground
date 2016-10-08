@@ -199,7 +199,7 @@ class GameEngine:
             for coor in nearbyCoordinates:
                 otherUnit = self.gridUnits[coor[0]][coor[1]]
                 if (otherUnit != C.EMPTY and otherUnit.GetPlayerID() != unit.GetPlayerID()):
-                    print(r,c,unit.GetPlayerID(),"VS",coor[0],coor[1],otherUnit.GetPlayerId())
+                    print(r,c,unit.GetPlayerID(),"VS",coor[0],coor[1],otherUnit.GetPlayerID())
                     enemyCount+=1
             self.gridUnitEnemyScore[r][c] = enemyCount
 
