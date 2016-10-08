@@ -9,6 +9,7 @@ import HexagridHelper as Helper
 import copy as copy
 from os.path import isfile, join, dirname, splitext, abspath, split
 import imp, importlib
+import sys
 class GameEngine:
 
     # Init function
@@ -163,10 +164,12 @@ class GameEngine:
             try:
                 self.playerMovements[i] = self.playerObject[i].getAction(i, gridTerrainPlayer[i], gridUnitsPlayer[i], self.memoryList[i])
             except:
+                e = sys.exc_info()[0]
+                print(e)
                 self.playerMovements[i] = []
                 for key, unit in self.unitDictionary.items():
                     if(key == i):
-                        self.playerMovements[i].append(Movement(unit.GetUnitID(),IDLE))
+                        self.playerMovements[i].append(Movement(unit.GetUnitID(),Helper.IDLE))
 
     # Movement phase, handles all the outputs of players' scripts and moves units concurrently
     # Any collision will cause all units in the tile to die
@@ -217,10 +220,11 @@ class GameEngine:
             nearbyCoordinates = Helper.GetAllWithinDistance(r,c,C.ATTACK_RANGE)
             enemyCount = 0
             for coor in nearbyCoordinates:
-                otherUnit = self.gridUnits[coor[0]][coor[1]]
-                if (otherUnit != C.EMPTY and otherUnit.GetPlayerID() != unit.GetPlayerID()):
-                    # print(r,c,unit.GetPlayerID(),"VS",coor[0],coor[1],otherUnit.GetPlayerID())
-                    enemyCount+=1
+                if (self.IsValidCoordinate(coor[0], coor[1])):
+                    otherUnit = self.gridUnits[coor[0]][coor[1]]
+                    if (otherUnit != C.EMPTY and otherUnit.GetPlayerID() != unit.GetPlayerID()):
+                        # print(r,c,unit.GetPlayerID(),"VS",coor[0],coor[1],otherUnit.GetPlayerID())
+                        enemyCount+=1
             self.gridUnitEnemyScore[r][c] = enemyCount
 
     # If a unit has enemies near him, check the enemy score of those enemies as well
