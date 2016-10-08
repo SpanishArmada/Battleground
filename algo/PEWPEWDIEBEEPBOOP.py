@@ -40,10 +40,10 @@ class PEWPEWDIEBEEPBOOP:
             'na': IDLE,
             'ne': UPPERRIGHT,
             'e': RIGHT,
-            'se': LOWERRIGHT,
+            'se': DOWNRIGHT,
             'nw': UPPERLEFT,
             'w': LEFT,
-            'sw': LOWERLEFT
+            'sw': DOWNLEFT
             }
         directions = ('ne', 'e', 'se','sw', 'w', 'nw')
 
@@ -68,7 +68,7 @@ class PEWPEWDIEBEEPBOOP:
         ours = []
         theirs = []
         freebies = []
-        unexplored = []
+        unexplored = set()
         for row in range(height):
             heatmap.append([])
             for col in range(width):
@@ -85,7 +85,7 @@ class PEWPEWDIEBEEPBOOP:
                     else:
                         theirs.append((row, col))
                 else: # Unexplored!
-                    unexplored.append((row, col))
+                    unexplored.add((row, col))
 
                 u = units[row][col]
                 if not isinstance(u, int): # Is not a unit!
@@ -111,10 +111,11 @@ class PEWPEWDIEBEEPBOOP:
                         visited[(new_row, new_col)] = distance + 1
                         q.append((new_row, new_col))
 
+        visited = {}
         for unexplored_row, unexplored_col in unexplored:
             q = deque()
-            q.append((freebie_row, freebie_col))
-            visited[(freebie_row, freebie_col)] = 0
+            q.append((unexplored_row, unexplored_col))
+            visited[(unexplored_row, unexplored_col)] = 0
             while not q:
                 row, col = q.popleft()
                 distance = visited[(row, col)]
@@ -125,10 +126,11 @@ class PEWPEWDIEBEEPBOOP:
                         visited[(new_row, new_col)] = distance + 1
                         q.append((new_row, new_col))
 
+        visited = {}
         for their_row, their_col in theirs:
             q = deque()
-            q.append((freebie_row, freebie_col))
-            visited[(freebie_row, freebie_col)] = 0
+            q.append((their_row, their_col))
+            visited[(their_row, their_col)] = 0
             while not q:
                 row, col = q.popleft()
                 distance = visited[(row, col)]
@@ -151,6 +153,6 @@ class PEWPEWDIEBEEPBOOP:
                     and heatmap[new_row][new_col] > max_heat:
                     max_heat = heatmap[new_row][new_col]
                     direction_max = direction
-            result.append(Movement(unit_id, direction_mapper[direction_max]))
+            results.append(Movement(unit_id, direction_mapper[direction_max]))
         return results
 
