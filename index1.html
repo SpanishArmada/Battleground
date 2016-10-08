@@ -5,7 +5,7 @@
 
 </head>
 <script>
-    var ws = new WebSocket("battleground-spanish-armada.herokuapp.com/ws");
+    var ws = new WebSocket("ws://localhost:8888/ws");
     var client_id;
     ws.onopen = function() {
         // pass row and col here
