@@ -163,11 +163,12 @@ class GameEngine:
     # Movement phase, handles all the outputs of players' scripts and moves units concurrently
     # Any collision will cause all units in the tile to die
     def MovementPhase(self):
-        isDeathMatrix = [[0 for i in range(self.col)] for j in range(self.row)]
+        isMovedUnit = {}
+        isDeathMatrix = [[C.EMPTY for i in range(self.col)] for j in range(self.row)]
 
         for i in range(self.playerNum):
             for mov in self.playerMovements[i]:
-                if(mov.GetUnitID() in self.unitDictionary.keys()):
+                if(mov.GetUnitID() in self.unitDictionary.keys() and not(mov.GetUnitID() in isMovedUnit.keys()) ):
                     curUnit = self.unitDictionary[mov.GetUnitID()]
                     oRow = curUnit.GetRow()
                     oCol = curUnit.GetCol()
@@ -176,11 +177,12 @@ class GameEngine:
                         if(self.IsValidCoordinate(nCoor[0], nCoor[1]) and self.gridTerrainMain[nCoor[0]][nCoor[1]] != C.WALL):
                             curUnit.SetRow(nCoor[0])
                             curUnit.SetCol(nCoor[1])
+                    isMovedUnit[mov.GetUnitID()] = True
         
         # check collision
         for key, curUnit in self.unitDictionary.items():
-            if(isDeathMatrix[curUnit.GetRow()][curUnit.GetCol()] == 0):
-                isDeathMatrix[curUnit.GetRow()][curUnit.GetCol()] == curUnit.GetUnitID()
+            if(isDeathMatrix[curUnit.GetRow()][curUnit.GetCol()] == C.EMPTY):
+                isDeathMatrix[curUnit.GetRow()][curUnit.GetCol()] = curUnit.GetUnitID()
             else:
                 self.KillUnit(curUnit.GetUnitID())
                 self.KillUnit(isDeathMatrix[curUnit.GetRow()][curUnit.GetCol()])
