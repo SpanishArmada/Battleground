@@ -11,15 +11,13 @@
 #  [UL] [UR]
 # [L] [I] [R]
 #  [DL] [DR]
-I = 0
-R = 1
-DR = 2
-DL = 3
-L = 4
-UL = 5
-UR = 6
-
-import GameConstant
+IDLE = 0
+RIGHT = 1
+DOWNRIGHT = 2
+DOWNLEFT = 3
+LEFT = 4
+UPPERLEFT = 5
+UPPERRIGHT = 6
 
 DCOL_ODDROW  = [0, 1, 1, 0, -1, 0, 1]
 DCOL_EVENROW = [0, 1, 0, -1, -1, -1, 0]
