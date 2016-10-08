@@ -4,7 +4,7 @@ class GameConstant:
 
     # Grid Type
     FOW = -1
-    EMPTY = 0
+    NON_WALL = 0
     WALL = 1
     HIVE = 2
 
@@ -16,3 +16,6 @@ class GameConstant:
     L = 4
     UL = 5
     UR = 6
+
+    # Ownership
+    EMPTY = -1
