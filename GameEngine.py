@@ -47,7 +47,36 @@ class GameEngine:
     # True if ending condition for the game has been fulfilled
     # Either a) Turn limit reached, or b) all hives+units belong to one player
     def GameHasEnded(self):
-        pass
+        if(self.TurnExceeded()):
+            return True
+        elif(self.OnePlayerLeft()):
+            return True
+        else:
+            return False
+    
+    # check if turn limit exceeded
+    def TurnExceeded(self):
+        return (self.turnNumber > C.TURN_LIMIT)
+
+    # check if only one player left
+    def OnePlayerLeft(self):
+        playerLeft = C.EMPTY
+
+        for hive in self.hiveList:
+            curID = hive.getPlayerID()
+            if(playerLeft == C.EMPTY):
+                playerLeft = curID
+                continue
+
+            if(curID != playerLeft and curID ! = C.EMPTY):
+                return False
+
+        for key, unit in self.unitDictionary.items():
+            curID = unit.GetPlayerID()
+            if(curID != playerLeft and curID != C.EMPTY):
+                return False
+
+        return True   
 
     # Main function to be called per turn.
     # Performs everything in order.
@@ -56,6 +85,7 @@ class GameEngine:
         self.RunAI()
         self.MovementPhase()
         self.ActionPhase()
+        self.UpdateArena()
         self.UpdateJSON()
         self.turnNumber += 1
 
@@ -102,7 +132,7 @@ class GameEngine:
         # execute ai for each player
         # store player movement
         for i in range(self.playerNum):
-            self.playerMovements[i] = self.playerObject[i].getAction(gridUnitsPlayer[i], gridTerrainPlayer[i], self.memoryList[i])
+            self.playerMovements[i] = self.playerObject[i].getAction(i, gridTerrainPlayer[i], gridUnitsPlayer[i], self.memoryList[i])
 
     # Movement phase, handles all the outputs of players' scripts and moves units concurrently
     # Any collision will cause all units in the tile to die
@@ -122,7 +152,7 @@ class GameEngine:
                             curUnit.SetCol(nCoor[1])
         
         # check collision
-        for curUnit in self.unitDictionary:
+        for key, curUnit in self.unitDictionary.items():
             if(isDeathMatrix[curUnit.GetRow][curUnit.GetCol] == 0):
                 isDeathMatrix[curUnit.GetRow][curUnit.GetCol] == curUnit.getUnitID()
             else:
@@ -197,6 +227,26 @@ class GameEngine:
     # Checks if this coordinate is valid
     def IsValidCoordinate(self, row, col):
         return (row>=0 and row < self.row and col>=0 and col<self.col)
+    
+    # Spawn unit in every hive if timer end and no unit on top
+    def UpdateArena(self):
+        # update timer for each hives
+        for hive in self.hiveList:
+            if(hive.GetPlayerID() != C.EMPTY):
+                unitOnTop = self.gridUnits[hive.GetRow()][hive.GetCol()]
+
+                if(unitOnTop != C.EMPTY):
+                    if(unitOnTop.GetPlayerID != hive.GetPlayerID):
+                        hive.SetNewPlayer(unitOnTop.GetPlayerID)
+                        continue
+                    else:
+                        freeOnTop = False
+                else:
+                    freeOnTop = True
+                
+                if(hive.IncrTimer(freeOnTop)):
+                    self.AddUnit(hive.GetPlayerID, hive.GetRow(), hive.GetCol())
+
 
     # Updates the JSON every turn with the turn's arena status
     def UpdateJSON(self):

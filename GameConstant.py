@@ -18,6 +18,7 @@ class GameConstant:
     RESPAWN = 3
     ATTACK_RANGE = 1
     VISION_RANGE = 5
+    TURN_LIMIT = 100
 
     # FOW
     HIDDEN = -1
