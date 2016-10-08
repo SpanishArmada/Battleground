@@ -136,13 +136,13 @@ def addPlus(grids, row, col, size):
     001100
     001100
     """
-    part = size / 3
+    part = size // 3
     iCounter = 0
     for i in range(row, row + size):
         jCounter = 0
         for j in range(col, col + size):
-            r = iCounter / part
-            c = jCounter / part
+            r = iCounter // part
+            c = jCounter // part
             jCounter += 1
             if((r + c) % 2 == 0 and not (r == 1 and c == 1)):
                 grids[i][j] = C.NON_WALL
