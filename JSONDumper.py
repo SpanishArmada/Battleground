@@ -33,8 +33,9 @@ class JSONDumper:
 
     def InitializeMap(self, terrainMap):
         self.data["map"] = terrainMap
+        self.turnData = []
 
-    def Update(self, iterationID, unitDictionary, hiveList):
+    def Update(self, unitDictionary, hiveList):
         newUnitList = []
         for key in unitDictionary.keys():
             pid = unitDictionary[key].GetPlayerID()
@@ -49,10 +50,11 @@ class JSONDumper:
             col = hive.GetCol()
             newHiveList.append([row,col,pid])
 
-        turnData = dict()
-        turnData["unitData"] = newUnitList
-        turnData["baseData"] = newHiveList
-        self.data[iterationID] = turnData
+        newTurnData = dict()
+        newTurnData["unitData"] = newUnitList
+        newTurnData["baseData"] = newHiveList
+        self.turnData.append(newTurnData)
 
     def GetDump(self):
+        self.data["turnData"] = self.turnData
         return json.dumps(self.data)
