@@ -11,10 +11,10 @@ class test:
             for j in i:
                 if(isinstance(j, int)):
                     continue
-                if j.GetUnitID() == pid:
+                if j.GetPlayerID() == pid:
                     if(counter % 2 == 0):
-                        results.append(Movement(pid, RIGHT))
+                        results.append(Movement(j.GetUnitID(), RIGHT))
                     else:
-                        results.append(Movement(pid, UPPERRIGHT))
+                        results.append(Movement(j.GetUnitID(), UPPERRIGHT))
                     counter += 1
         return results
