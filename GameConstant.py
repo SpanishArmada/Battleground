@@ -22,3 +22,5 @@ class GameConstant:
 
     # Game
     RESPAWN = 3
+    ATTACK_RANGE = 1
+    VISION_RANGE = 5
