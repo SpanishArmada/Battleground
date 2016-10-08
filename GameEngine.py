@@ -43,8 +43,15 @@ class GameEngine:
         # main function
 
     def CalculateFoW(self):
-        pass
         # generate map for each player
+        for i in range(self.row):
+            for j in range(self.col):
+                tmpPlayer = gridUnits[i][j].GetPlayerID()
+                if(tmpPlayer != C.EMPTY):
+                    listViewed = Helper.GetAllWithinDistance(i, j, C.VISION_RANGE)
+                    for coor in listViewed:
+                        if(IsValidCoordinate(coor[0],coor[1])):
+                            gridFoW[tmpPlayer][coor[0]][coor[1]] = 1
     
     def RunAI(self):
         pass
@@ -53,9 +60,30 @@ class GameEngine:
         # store movement
 
     def MovementPhase(self):
-        pass
+        isDeathMatrix = [[0 for i in range self.col] in range self.row]
+
+        for i in range(self.playerNum):
+            for mov in self.playerMovements[i]:
+                if(mov.getUnitID in self.unitDictionary)
+                    curUnit = unitDictionary[mov.getUnitID()]
+                    oRow = curUnit.GetRow()
+                    oCol = curUnit.GetCol()
+                    if(curUnit.GetPlayerID() == i):
+                        nCoor = Helper.GetMoveTarget(oRow, oCol, mov.getMove())
+                        if(IsValidCoordinate(nCoor[0], nCoor[1]) and gridTerrainMain[nCoor[0]][nCoor[1]] != C.WALL):
+                            curUnit.SetRow(nCoor[0])
+                            curUnit.SetCol(nCoor[1])
+        
         # check collision
+        for curUnit in unitDictionary:
+            if(isDeathMatrix[curUnit.GetRow][curUnit.GetCol] == 0):
+                isDeathMatrix[curUnit.GetRow][curUnit.GetCol] == curUnit.getUnitID()
+            else:
+                KillUnit(curUnit.getUnitID())
+                KillUnit(isDeathMatrix[curUnit.GetRow][curUnit.GetCol])
+        
         # place on a new map
+        resetGridUnits() 
 
     def ActionPhase(self):
         self.CalculateEnemyScore()
