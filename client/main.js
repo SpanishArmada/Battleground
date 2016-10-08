@@ -5,9 +5,10 @@ var ctx = canvas.getContext('2d');
 
 var topLeft = [21, 21];
 
-var bgColor = '#789030';
+// var bgColor = '#789030';
+var bgColor = '#000000';
 var gridProperties = {
-    dirtColor: '#784800',
+    dirtColor: '#703500',
     wallColor: '#e0cda7',
     width: 10,
     height: 10,
@@ -142,5 +143,5 @@ var testUnitMovementDraw = function () {
 
 document.addEventListener('DOMContentLoaded', function (event) {
     // testDraw();
-    // testUnitMovementDraw();
+    testUnitMovementDraw();
 })
