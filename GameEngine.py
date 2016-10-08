@@ -116,6 +116,7 @@ class GameEngine:
         self.playerMovements = [C.EMPTY for i in range(self.playerNum)]
         self.gridUnitEnemyScore = [[C.EMPTY for i in range(self.col)] for j in range(self.row)]
         self.gridUnitDeathMark = [[C.EMPTY for i in range(self.col)] for j in range(self.row)]
+        self.gridDeathPositions = [[C.EMPTY for i in range(self.col)] for j in range(self.row)]
 
     # Clears gridUnits and recalculates it based on unitDictionary
     # To be called whenever a unitDictionary is modified (a unit is moved/killed)
@@ -163,11 +164,12 @@ class GameEngine:
     # Movement phase, handles all the outputs of players' scripts and moves units concurrently
     # Any collision will cause all units in the tile to die
     def MovementPhase(self):
-        isDeathMatrix = [[0 for i in range(self.col)] for j in range(self.row)]
+        isMovedUnit = {}
+        isDeathMatrix = [[C.EMPTY for i in range(self.col)] for j in range(self.row)]
 
         for i in range(self.playerNum):
             for mov in self.playerMovements[i]:
-                if(mov.GetUnitID() in self.unitDictionary.keys()):
+                if(mov.GetUnitID() in self.unitDictionary.keys() and not(mov.GetUnitID() in isMovedUnit.keys()) ):
                     curUnit = self.unitDictionary[mov.GetUnitID()]
                     oRow = curUnit.GetRow()
                     oCol = curUnit.GetCol()
@@ -176,14 +178,20 @@ class GameEngine:
                         if(self.IsValidCoordinate(nCoor[0], nCoor[1]) and self.gridTerrainMain[nCoor[0]][nCoor[1]] != C.WALL):
                             curUnit.SetRow(nCoor[0])
                             curUnit.SetCol(nCoor[1])
+                    isMovedUnit[mov.GetUnitID()] = True
         
         # check collision
+
+        deathList = []
         for key, curUnit in self.unitDictionary.items():
-            if(isDeathMatrix[curUnit.GetRow()][curUnit.GetCol()] == 0):
-                isDeathMatrix[curUnit.GetRow()][curUnit.GetCol()] == curUnit.GetUnitID()
+            if(isDeathMatrix[curUnit.GetRow()][curUnit.GetCol()] == C.EMPTY):
+                isDeathMatrix[curUnit.GetRow()][curUnit.GetCol()] = curUnit.GetUnitID()
             else:
-                self.KillUnit(curUnit.GetUnitID())
-                self.KillUnit(isDeathMatrix[curUnit.GetRow()][curUnit.GetCol()])
+                deathList.append(curUnit.GetUnitID())
+                deathList.append(isDeathMatrix[curUnit.GetRow()][curUnit.GetCol()])
+
+        for deathTarget in deathList:
+            self.KillUnit(deathTarget)
         
         # place on a new map
         self.ResetGridUnits()
@@ -259,6 +267,12 @@ class GameEngine:
     def KillUnit(self, unitId):
         # print("Kill unitID", unitId)
         killedUnit = self.unitDictionary.pop(unitId, None)
+        if (killedUnit != None):
+            playerOwner = killedUnit.GetPlayerID()
+            if (self.gridDeathPositions[killedUnit.GetRow()][killedUnit.GetCol()] == -1):
+                self.gridDeathPositions[killedUnit.GetRow()][killedUnit.GetCol()] = playerOwner
+            else:
+                self.gridDeathPositions[killedUnit.GetRow()][killedUnit.GetCol()] = 100 # Multiple players' units died here
         return killedUnit!=None
 
     # Checks if this coordinate is valid
@@ -284,8 +298,7 @@ class GameEngine:
                 if(hive.IncrTimer(freeOnTop)):
                     self.AddUnit(hive.GetPlayerID(), hive.GetRow(), hive.GetCol())
 
-
     # Updates the JSON every turn with the turn's arena status
     def UpdateJSON(self):
-        self.jsonDumper.Update(self.unitDictionary, self.hiveList)
+        self.jsonDumper.Update(self.unitDictionary, self.hiveList, self.gridDeathPositions)
         # store state for each turn
