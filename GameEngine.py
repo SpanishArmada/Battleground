@@ -1,5 +1,5 @@
 # Game Engine
- 
+
 from Unit import Unit
 from Hive import Hive
 from GameConstant import GameConstant as C
@@ -9,56 +9,71 @@ import copy as copy
 
 class GameEngine:
 
+    # Init function
     def __init__(self, col = 50, row = 50, playerNum = 2):
-        self.gridTerrainMain = [[C.EMPTY for i in range(col)] for j in range(row)]
-        self.gridUnits = [[C.EMPTY for i in range(col)] for j in range(row)]
-        self.unitDictionary = dict()
-        self.hiveList = []
-        self.memoryList = [0 for i in range(playerNum)]
-        self.playerNum = playerNum
         self.row = row
         self.col = col
+        self.playerNum = playerNum
+
+        self.gridTerrainMain = [[C.EMPTY for i in range(col)] for j in range(row)]
+        self.gridUnits = [[C.EMPTY for i in range(col)] for j in range(row)]
+
+        self.unitDictionary = dict()
         self.unitCount = 0
-        self.jsonDumper = JSONDumper()
+        self.hiveList = []
+        self.memoryList = [0 for i in range(playerNum)]
         self.turnNumber = 0
 
-    def ResetGridUnits(self):
-        self.gridUnits = [[C.EMPTY for i in range(self.col)] for j in range(self.row)]
-        for key, unit in self.unitDictionary.items():
-            self.gridUnits[unit.GetRow][unit.GetCol] = unit
+        self.jsonDumper = JSONDumper()
 
-    def ResetVariables(self):
-        # Variables for running AI
-        self.gridFoW = [[[C.EMPTY for i in range(self.col)] for j in range(self.row)] for k in range(self.playerNum)]
-
-        # Variables for movement phase
-        self.playerMovements = [C.EMPTY for i in range(self.playerNum)]
-
-        # Variables for action phase
-        self.gridUnitEnemyScore = [[C.EMPTY for i in range(self.col)] for j in range(self.row)]
-        self.gridUnitDeathMark = [[C.EMPTY for i in range(self.col)] for j in range(self.row)]
-    
+    # Function to be called. Simulates the game and returns the json dump
     def Start(self, gridTerrain, playerObject):
         self.ReadTerrain(gridTerrain)
         self.jsonDumper.InitializeMap(gridTerrain)
         self.playerObject = playerObject
+        while not self.GameHasEnded():
+            self.Update()
+        return self.jsonDumper.GetDump()
 
+    # Copies input terrain and stores the hives into hiveList
     def ReadTerrain(self, gridTerrain):
         for i in range(self.row):
             for j in range(self.col):
                 self.gridTerrainMain[i][j] = gridTerrain[i][j]
-                if (gridTerrain[i][j] >= 9): # Hive
-                    newHive = Hive(i,j,gridTerrain[i][j]-10)
+                if (gridTerrain[i][j] >= C.EMPTY_HIVE): # Hive
+                    newHive = Hive(i,j,gridTerrain[i][j]-C.PLAYER_HIVE)
                     self.hiveList.append(newHive)
 
+    # True if ending condition for the game has been fulfilled
+    # Either a) Turn limit reached, or b) all hives+units belong to one player
+    def GameHasEnded(self):
+        pass
+
+    # Main function to be called per turn.
+    # Performs everything in order.
     def Update(self):
         self.ResetVariables()
         self.RunAI()
         self.MovementPhase()
         self.ActionPhase()
-        self.WriteToFile()
-        # main function
+        self.UpdateJSON()
+        self.turnNumber += 1
 
+    # Resets variables for an update cycle
+    def ResetVariables(self):
+        self.gridFoW = [[[C.EMPTY for i in range(self.col)] for j in range(self.row)] for k in range(self.playerNum)]
+        self.playerMovements = [C.EMPTY for i in range(self.playerNum)]
+        self.gridUnitEnemyScore = [[C.EMPTY for i in range(self.col)] for j in range(self.row)]
+        self.gridUnitDeathMark = [[C.EMPTY for i in range(self.col)] for j in range(self.row)]
+
+    # Clears gridUnits and recalculates it based on unitDictionary
+    # To be called whenever a unitDictionary is modified (a unit is moved/killed)
+    def ResetGridUnits(self):
+        self.gridUnits = [[C.EMPTY for i in range(self.col)] for j in range(self.row)]
+        for key, unit in self.unitDictionary.items():
+            self.gridUnits[unit.GetRow][unit.GetCol] = unit
+
+    # Calculates each player's fog of war
     def CalculateFoW(self):
         # generate map for each player
         for i in range(self.row):
@@ -69,12 +84,14 @@ class GameEngine:
                     for coor in listViewed:
                         if(self.IsValidCoordinate(coor[0],coor[1])):
                             self.gridFoW[tmpUnit.GetPlayerID()][coor[0]][coor[1]] = C.REVEALED
-    
+
+    # Runs each player's AI function
     def RunAI(self):
+        self.CalculateFoW()
         gridUnitsPlayer = [[[C.EMPTY for i in range(self.col)] for j in range(self.row)] for k in range(self.playerNum)]
         gridTerrainPlayer = [[[C.EMPTY for i in range(self.col)] for j in range(self.row)] for k in range(self.playerNum)]
         
-         # calculate parameters to pass
+        # Calculate parameters to pass
         for i in range(self.playerNum):
             for j in range(self.row):
                 for k in range(self.col):
@@ -87,7 +104,8 @@ class GameEngine:
         for i in range(self.playerNum):
             self.playerMovements[i] = self.playerObject[i].getAction(gridUnitsPlayer[i], gridTerrainPlayer[i], self.memoryList[i])
 
-
+    # Movement phase, handles all the outputs of players' scripts and moves units concurrently
+    # Any collision will cause all units in the tile to die
     def MovementPhase(self):
         isDeathMatrix = [[0 for i in range(self.col)] in range(self.row)]
 
@@ -114,11 +132,13 @@ class GameEngine:
         # place on a new map
         self.ResetGridUnits()
 
+    # Action phase, handles all the automatic battling of near units
     def ActionPhase(self):
         self.CalculateEnemyScore()
         self.CheckDeath()
         self.ApplyDeath()
 
+    # First calculates the enemy score of units - no of enemies within attack range of an unit
     def CalculateEnemyScore(self):
         for r in range(self.row):
             for c in range(self.col):
@@ -132,6 +152,8 @@ class GameEngine:
                             enemyCount+=1
                     self.gridUnitEnemyScore[r][c] = enemyCount
 
+    # If a unit has enemies near him, check the enemy score of those enemies as well
+    # If the enemy score of this unit is >= the minimum of all enemies' score, mark this unit for death
     def CheckDeath(self):
         for r in range(self.row):
             for c in range(self.col):
@@ -148,6 +170,7 @@ class GameEngine:
 
                     self.gridUnitDeathMark[r][c] = minEnemyScore <= unitEnemyScore
 
+    # Apply all death marks to units
     def ApplyDeath(self):
         for r in range(self.row):
             for c in range(self.col):
@@ -171,14 +194,11 @@ class GameEngine:
         killedUnit = self.unitDictionary.pop(unitId, None)
         return killedUnit!=None
 
+    # Checks if this coordinate is valid
     def IsValidCoordinate(self, row, col):
         return (row>=0 and row < self.row and col>=0 and col<self.col)
 
-    def Test(self):
-        print(self.gridFoW[0][0][0])
-
-    def WriteToFile(self):
+    # Updates the JSON every turn with the turn's arena status
+    def UpdateJSON(self):
         self.jsonDumper.Update(self.unitDictionary, self.hiveList)
         # store state for each turn
-
-    
