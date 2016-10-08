@@ -17,5 +17,5 @@ class Grid:
         self.gridType = gridType
         self.hive = hive
 
-    def setHype(self, hive = GameConstant.EMPTY:
+    def setHype(self, hive = GameConstant.EMPTY):
         self.hive = hive
