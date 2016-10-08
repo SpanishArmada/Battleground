@@ -6,7 +6,9 @@ class GameConstant:
     FOW = -1
     NON_WALL = 0
     WALL = 1
-    HIVE = 2
+
+    EMPTY_HIVE = 9
+    PLAYER_HIVE = 10
 
     # Ownership
     EMPTY = -1

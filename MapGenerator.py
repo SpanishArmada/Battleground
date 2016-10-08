@@ -1,6 +1,7 @@
 from GameConstant import GameConstant as C
-def addHive(grids, row, col):
-    grids[row][col] = C.HIVE
+
+def addHive(grids, row, col, playerId):
+    grids[row][col] = C.PLAYER_HIVE + playerId
 
 
 def getPercentile(start, end, distance):
@@ -108,12 +109,12 @@ def addRiver(grids, rowStart, rowEnd, colStart, colEnd, bridge):
 
 def getMap(row, col):
     grids = [[C.NON_WALL for i in range(row)] for j in range(col)]
-    addHive(grids, getPercentile(0, row, 0.5), 2)
-    addHive(grids, getPercentile(0, row, 0.5), col - 3)
-    addHive(grids, 5, 10)
-    addHive(grids, row - 5, 10)
-    addHive(grids, 5, col - 10)
-    addHive(grids, row - 5, col - 10)
+    addHive(grids, getPercentile(0, row, 0.5), 2, 0)    #player 0
+    addHive(grids, getPercentile(0, row, 0.5), col - 3) #player 1
+    addHive(grids, 5, 10, -1)                           #not taken
+    addHive(grids, row - 5, 10, -1)                     #not taken
+    addHive(grids, 5, col - 10, -1)                     #not taken
+    addHive(grids, row - 5, col - 10, -1)               #not taken
     addType4(grids, row, col, 5)
     addRiver(grids, 0, row - 1, getPercentile(0, col, 0.5) - 2, getPercentile(0, col, 0.5) + 2, 5)
     addType3(grids, 0, 7, 7, 12, 1)
