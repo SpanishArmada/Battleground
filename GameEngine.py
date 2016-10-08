@@ -85,6 +85,7 @@ class GameEngine:
         self.RunAI()
         self.MovementPhase()
         self.ActionPhase()
+        self.UpdateArena()
         self.UpdateJSON()
         self.turnNumber += 1
 
@@ -131,7 +132,7 @@ class GameEngine:
         # execute ai for each player
         # store player movement
         for i in range(self.playerNum):
-            self.playerMovements[i] = self.playerObject[i].getAction(gridUnitsPlayer[i], gridTerrainPlayer[i], self.memoryList[i])
+            self.playerMovements[i] = self.playerObject[i].getAction(i, gridTerrainPlayer[i], gridUnitsPlayer[i], self.memoryList[i])
 
     # Movement phase, handles all the outputs of players' scripts and moves units concurrently
     # Any collision will cause all units in the tile to die
