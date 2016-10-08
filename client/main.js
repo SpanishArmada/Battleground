@@ -18,19 +18,19 @@ var fetchJSONFile = function (path, callback) {
 var canvas = document.getElementById('canvas');
 var ctx = canvas.getContext('2d');
 
-var topLeft = [21, 21];
+var topLeft = [51, 51];
 
 // var bgColor = '#789030';
 var bgColor = '#000000';
 var gridProperties = {
     dirtColor: '#703500',
     wallColor: '#000000',
-    width: 10,
-    height: 10,
+    width: 16,
+    height: 16,
     spacing: 2,
     EMPTY: 0,
     WALL: 1,
-    HIVE: 2,
+    HIVE: 9,
 }
 
 var unitProperties = {
@@ -39,22 +39,22 @@ var unitProperties = {
         '#0000ff',
         '#00ff00',
     ],
-    radius: 4,
+    radius: 6,
 }
 
 var hiveProperties = {
     color: [
+        '#7f7f7f',
         '#cc0000',
         '#0000cc',
         '#00cc00',
-        '#7f7f7f'
     ],
-    radius: 3,
-    border: 2,
+    radius: 6,
+    border: 4,
 }
 
-var mapWidth = 50;
-var mapHeight = 50;
+var mapWidth = 30;
+var mapHeight = 30;
 var map = [];
 
 var directions = ['ne', 'e', 'se','sw', 'w', 'nw'];
@@ -137,7 +137,7 @@ var drawWall = function (row, col) {
 }
 
 var drawHive = function (row, col, playerId) {
-    playerId = (typeof playerId === 'undefined' || playerId === -1 ? 3 : playerId);
+    playerId = (typeof playerId === 'undefined' || playerId === -1 ? 0 : playerId);
     var relativeCoordinate = resolveCoordinate(row, col);
     var x1 = topLeft[0] + relativeCoordinate[0];
     var y1 = topLeft[1] + relativeCoordinate[1];
@@ -158,12 +158,6 @@ var drawHive = function (row, col, playerId) {
     ctx.restore();
 }
 
-var drawHandlers = [
-    drawEmpty,
-    drawWall,
-    drawHive,
-]
-
 var drawMap = function () {
     ctx.save();
     ctx.fillStyle = '#000000';
@@ -171,16 +165,23 @@ var drawMap = function () {
     ctx.restore();
     for(var row = 0; row < mapHeight; ++row) {
         for(var col = 0; col < mapWidth; ++col) {
-            drawHandlers[map[row][col]](row, col);
+            var gridType = map[row][col];
+            if(gridType === gridProperties.WALL) {
+                drawWall(row, col)
+            } else if(gridType === gridProperties.EMPTY) {
+                drawEmpty(row, col)
+            } else if(gridType >= HIVE) {
+                drawHive(row, col, gridType - HIVE);
+            }
         }
     }
 }
 
 
 var test = (function () {
-    var mapWidth = 50;
-    var mapHeight = 50;
-    var topLeft = [21, 21];
+    var mapWidth = 30;
+    var mapHeight = 30;
+    var topLeft = [51, 51];
 
     var testDraw = function () {
         canvas.width = 640;
@@ -190,16 +191,24 @@ var test = (function () {
         ctx.fillRect(0, 0, 800, 800);
         ctx.restore();
         var wallChance = 0.07;
+        var hiveChance = wallChance + 0.002;
         for(var row = 0; row < mapHeight; ++row) {
             for(var col = 0; col < mapWidth; ++col) {
                 var relativeCoordinate = resolveCoordinate(row, col);
                 var x1 = topLeft[0] + relativeCoordinate[0];
                 var y1 = topLeft[1] + relativeCoordinate[1];
                 ctx.save();
-                if(Math.random() < wallChance) {
+                var roll = Math.random();
+                if(roll < wallChance) {
                     ctx.fillStyle = gridProperties.wallColor;
-                } else ctx.fillStyle = gridProperties.dirtColor;
-                ctx.fillRect(x1, y1, gridProperties.width, gridProperties.height);
+                    ctx.fillRect(x1, y1, gridProperties.width, gridProperties.height);
+                } else if(roll < hiveChance) {
+                    drawHive(row, col);
+                }
+                else {
+                    ctx.fillStyle = gridProperties.dirtColor;
+                    ctx.fillRect(x1, y1, gridProperties.width, gridProperties.height);
+                }
                 ctx.restore();
             }
         }
@@ -246,9 +255,9 @@ var test = (function () {
 })();
 
 document.addEventListener('DOMContentLoaded', function (event) {
-    // test.draw();
-    // test.unitMovementDraw();
     canvas.width = 640;
     canvas.height = 640;
+    // test.draw();
+    // test.unitMovementDraw();
     drawMap();
 })
