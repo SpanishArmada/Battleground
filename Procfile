@@ -1,1 +1,1 @@
-web: python main.py --port=8888
+web: python main.py --port=$PORT
