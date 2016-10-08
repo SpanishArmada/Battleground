@@ -1,6 +1,5 @@
 # Game Engine
-
-from Grid import Grid
+ 
 from Unit import Unit
 from Hive import Hive
 from GameConstant import GameConstant as C
@@ -45,7 +44,12 @@ class GameEngine:
         self.playerObject = playerObject
 
     def ReadTerrain(self, gridTerrain):
-
+        for i in range(self.row):
+            for j in range(self.col):
+                self.gridTerrainMain[i][j] = gridTerrain[i][j]
+                if (gridTerrain[i][j] >= 9): # Hive
+                    newHive = Hive(i,j,gridTerrain[i][j]-10)
+                    self.hiveList.append(newHive)
 
     def Update(self):
         self.ResetVariables()
@@ -53,7 +57,6 @@ class GameEngine:
         self.MovementPhase()
         self.ActionPhase()
         self.WriteToFile()
-        pass
         # main function
 
     def CalculateFoW(self):
@@ -153,15 +156,17 @@ class GameEngine:
                     self.KillUnit(unit.GetUnitID)
         self.ResetGridUnits()
 
-
+    # Adds a new unit owned by playerId, at [row, col] to unitDictionary
+    # Also automatically gives it a unique ID, and increments the unit counter
     def AddUnit(self, playerId, row, col):
         newUnitId = self.unitCount # TODO: make a hash function for id
         newUnit = Unit(newUnitId, playerId, row, col)
         self.unitDictionary[newUnitId] = newUnit
         self.gridUnits[row][col] = newUnit
         self.unitCount += 1
-        pass
 
+    # Deletes a unit with ID unitId from unitDictionary.
+    # NOTE: Run ResetGridUnits after killing any unit to update the grid!
     def KillUnit(self, unitId):
         killedUnit = self.unitDictionary.pop(unitId, None)
         return killedUnit!=None
@@ -173,7 +178,7 @@ class GameEngine:
         print(self.gridFoW[0][0][0])
 
     def WriteToFile(self):
-        self.jsonDumper.Update(self.turnNumber, self.unitDictionary, self.hiveList)
+        self.jsonDumper.Update(self.unitDictionary, self.hiveList)
         # store state for each turn
 
     
