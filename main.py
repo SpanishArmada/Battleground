@@ -18,7 +18,7 @@ algoList = []
 server = None
 counter = 0
 GE = None
-path = dirname(abspath(__file__)) + '\\' + "algo" + '\\'
+path = dirname(abspath(__file__)) + '\\'
 def load_from_file(filepath, expectedClass):
     class_inst = None
 
