@@ -10,6 +10,7 @@ from os.path import isfile, join, dirname, splitext, abspath, split
 import imp, importlib
 
 clients = []
+algoList = []
 server = None
 counter = 0
 path = dirname(abspath(__file__)) + '\\' + "algo" + '\\'
@@ -89,10 +90,14 @@ class SocketHandler(tornado.websocket.WebSocketHandler):
                     clients.remove(i)
                     break
         elif(msg_type == 2):
-            print("INSIDE INDEX 2")
             algoList = get_algo()
             print(algoList)
             data = {"type": 1, "algoList": algoList}
+            self.write_message(data)
+        elif(msg_type == 3):
+            # call function with algoList as parameter here
+            result = 0
+            data = {"type": 1, "algoList": result}
             self.write_message(data)
 
     def on_close(self):
@@ -100,17 +105,25 @@ class SocketHandler(tornado.websocket.WebSocketHandler):
             
 class Simulate(tornado.web.RequestHandler):
     def post(self):
+        global algoList
         algo1 = self.get_body_argument("algo1", default=None, strip=False)
         algo2 = self.get_body_argument("algo2", default=None, strip=False)
 
         f = load_from_file(path + algo1, algo1[:-3])
         f1 = load_from_file(path + algo2, algo2[:-3])
+        algoList.append(f)
+        algoList.append(f1)
         print(f.getAction([5, 5]))
         print(f1.getAction([5, 5]))
+        self.render("client/index.html")
 
 class SkipUpload(tornado.web.RequestHandler):
     def post(self):
         self.render("index2.html")
+
+settings = {
+    "static_path": join(dirname(__file__), "client"),}
+
 def make_app():
     return tornado.web.Application([
         (r"/", MainHandler),
@@ -118,10 +131,12 @@ def make_app():
         (r"/ws", SocketHandler),
         (r"/simulate", Simulate),
         (r"/skipUpload", SkipUpload),
-    ])
+    ], **settings)
 
 def update_client():
     pass
+
+
 if __name__ == "__main__":
     app = make_app()
     app.listen(8888)

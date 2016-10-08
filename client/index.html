@@ -1,15 +1,37 @@
 <!DOCTYPE html>
 <html>
+    <script>
+        var ws = new WebSocket("ws://localhost:8888/ws");
+        var client_id;
+        console.log("INSIDE simulation")
+        ws.onopen = function() {
+            console.log("Connection open")
+            ws.send(JSON.stringify({type: 3}));
+        };
+        ws.onmessage = function (evt) {
+            data = JSON.parse(evt.data);
+            if(data.type == 0) {
+                client_id = data.client_id;
+                jsonData = data.jsonData 
+            }
+        };
+
+        window.onbeforeunload = function() {
+            ws.send(JSON.stringify({type: 1, client_id: client_id}));
+            ws.onclose = function () {}; // disable onclose handler first
+            ws.close()
+        };
+    </script>
     <head>
         <meta charset="utf-8" />
         <title>Battleground - NTU IEEE Hackathon 2016</title>
-        <link rel="stylesheet" type="text/css" href="style.css" />
+        <link rel="stylesheet" type="text/css" href={{ static_url("style.css") }} />
     </head>
     <body>
         <header id="header"></header>
         <main id="main">
             <canvas id="canvas"></canvas>
         </main>
-        <script type="text/javascript" src="main.js"></script>
+        <script type="text/javascript" src={{ static_url("main.js") }}></script>
     </body>
 </html>
