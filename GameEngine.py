@@ -11,9 +11,16 @@ class GameEngine:
     def __init__(self, col = 50, row = 50, playerNum = 2):
         self.gridTerrainMain = [[C.EMPTY for i in range(col)] for j in range(row)]
         self.gridUnits = [[C.EMPTY for i in range(col)] for j in range(row)]
+        self.unitDictionary = dict()
         self.playerNum = playerNum
         self.row = row
         self.col = col
+        self.unitCount = 0
+
+    def ResetGridUnits(self):
+        self.gridUnits = [[C.EMPTY for i in range(self.col)] for j in range(self.row)]
+        for key, unit in self.unitDictionary.items():
+            self.gridUnits[unit.GetRow][unit.GetCol] = unit
 
     def ResetVariables(self):
         # Variables for running AI
@@ -51,10 +58,9 @@ class GameEngine:
         # place on a new map
 
     def ActionPhase(self):
-        pass
-        # Calculate enemy
-        # check death
-        # apply death
+        self.CalculateEnemyScore()
+        self.CheckDeath()
+        self.ApplyDeath()
 
     def CalculateEnemyScore(self):
         for r in range(self.row):
@@ -83,14 +89,28 @@ class GameEngine:
                         if (otherUnit != C.EMPTY and otherUnit.playerID != unit.playerID):
                             minEnemyScore = min(minEnemyScore, otherUnitEnemyScore)
 
-                    self.gridUnitDeathMark = minEnemyScore <= unitEnemyScore
+                    self.gridUnitDeathMark[r][c] = minEnemyScore <= unitEnemyScore
 
     def ApplyDeath(self):
         for r in range(self.row):
             for c in range(self.col):
-                pass
+                unit = self.gridUnits[r][c]
+                if (unit != C.EMPTY and self.gridUnitDeathMark[r][c]):
+                    self.KillUnit(unit.GetUnitID)
+        self.ResetGridUnits()
 
 
+    def AddUnit(self, playerId, row, col):
+        newUnitId = self.unitCount # TODO: make a hash function for id
+        newUnit = Unit(newUnitId, playerId, row, col)
+        self.unitDictionary[newUnitId] = newUnit
+        self.gridUnits[row][col] = newUnit
+        self.unitCount += 1
+        pass
+
+    def KillUnit(self, unitId):
+        killedUnit = self.unitDictionary.pop(unitId, None)
+        return killedUnit!=None
 
     def IsValidCoordinate(self, row, col):
         return (row>=0 and row < self.row and col>=0 and col<self.col)
