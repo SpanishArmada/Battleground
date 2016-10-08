@@ -9,30 +9,30 @@ class Hive:
         self.playerID = playerID
         self.hiveTimer = 0
 
-    def getCol(self):
+    def GetCol(self):
         return self.cPos
 
-    def getRow(self):
+    def GetRow(self):
         return self.rPos
 
-    def getPlayerID(self):
+    def GetPlayerID(self):
         return self.playerID
 
-    def getTimer(self):
+    def GetTimer(self):
         return self.hiveTimer
 
-    def setCol(self, cPos):
+    def SetCol(self, cPos):
         self.cPos = cPos
 
-    def setRow(self, rPos):
+    def SetRow(self, rPos):
         self.rPos = rPos
 
-    def setNewPlayer(self, playerID):
+    def SetNewPlayer(self, playerID):
         if(self.playerID != playerID):
             self.playerID = playerID
             resetTimer()
 
-    def incrTimer(self):
+    def IncrTimer(self):
         self.hiveTimer += 1
         if(self.hiveTimer >= GameConstant.RESPAWN):
             resetTimer()
@@ -40,6 +40,6 @@ class Hive:
         else:
             return false
 
-    def resetTimer(self):
+    def ResetTimer(self):
         self.hiveTimer = 0;
 

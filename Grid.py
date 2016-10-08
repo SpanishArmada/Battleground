@@ -7,15 +7,15 @@ class Grid:
         self.gridType = gridType
         self.hive = hive
     
-    def getType(self):
+    def GetType(self):
         return self.gridType
 
-    def getHive(self):
+    def GetHive(self):
         return self.hive
 
-    def setType(self, gridType, hive = GameConstant.EMPTY):
+    def SetType(self, gridType, hive = GameConstant.EMPTY):
         self.gridType = gridType
         self.hive = hive
 
-    def setHype(self, hive = GameConstant.EMPTY):
+    def SetHype(self, hive = GameConstant.EMPTY):
         self.hive = hive
