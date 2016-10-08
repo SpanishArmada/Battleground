@@ -43,21 +43,52 @@ def addType3(grids, rowStart, rowEnd, colStart, colEnd, interval):
 
 def addType4(grids, row, col, size):
     """
-    111111111
-    111101111
-    111000111
-    110000011
-    100000001
-    000000000
-    100000001
-    110000011
-    111000111
-    111101111
-    111111111
+    10000 for each corner
+    11000
+    11100
+    11110
+    11111
     """
-    counter = 0
-    # for i in range (row, row + size):
-    #     for i in ra
+    counter = 1
+    for i in range(row - size, row):
+        temp = counter
+        for j in range(0, size):
+            if(temp > 0):
+                grids[i][j] = C.WALL
+                temp -= 1
+            else:
+                grids[i][j] = C.NON_WALL
+        counter += 1
+    counter = 5
+    for i in range(0, size):
+        temp = counter
+        for j in range(0, size):
+            if(temp > 0):
+                grids[i][j] = C.WALL
+                temp -= 1
+            else:
+                grids[i][j] = C.NON_WALL
+        counter -= 1
+    counter = 5
+    for i in range(0, size):
+        temp = counter
+        for j in range(col - 1, col - size - 1, -1):
+            if(temp > 0):
+                grids[i][j] = C.WALL
+                temp -= 1
+            else:
+                grids[i][j] = C.NON_WALL
+        counter -= 1
+    counter = 1
+    for i in range(row - size, row):
+        temp = counter
+        for j in range(col - 1, col - size - 1, -1):
+            if(temp > 0):
+                grids[i][j] = C.WALL
+                temp -= 1
+            else:
+                grids[i][j] = C.NON_WALL
+        counter += 1
 
 def addRiver(grids, rowStart, rowEnd, colStart, colEnd, bridge):
     """
@@ -77,8 +108,13 @@ def addRiver(grids, rowStart, rowEnd, colStart, colEnd, bridge):
 
 def getMap(row, col):
     grids = [[C.NON_WALL for i in range(row)] for j in range(col)]
-    addHive(grids, getPercentile(0, row, 0.5), 0)
-    addHive(grids, getPercentile(0, row, 0.5), col - 1)
+    addHive(grids, getPercentile(0, row, 0.5), 2)
+    addHive(grids, getPercentile(0, row, 0.5), col - 3)
+    addHive(grids, 5, 10)
+    addHive(grids, row - 5, 10)
+    addHive(grids, 5, col - 10)
+    addHive(grids, row - 5, col - 10)
+    addType4(grids, row, col, 5)
     addRiver(grids, 0, row - 1, getPercentile(0, col, 0.5) - 2, getPercentile(0, col, 0.5) + 2, 5)
     addType3(grids, 0, 7, 7, 12, 1)
     addType3(grids, row - 7, row - 1, col - 7, col - 1, 1)
