@@ -226,11 +226,18 @@ class GameEngine:
 
     # Apply all death marks to units
     def ApplyDeath(self):
+
+        deathIDUnit = []
+
         for key, unit in self.unitDictionary.items():
             r = unit.GetRow()
             c = unit.GetCol()
             if (self.gridUnitDeathMark[r][c] == 1):
-                self.KillUnit(unit.GetUnitID())
+                deathIDUnit.append(unit.GetUnitID())
+
+        for id in deathIDUnit:
+            self.KillUnit(id)
+
         self.ResetGridUnits()
 
     # Adds a new unit owned by playerId, at [row, col] to unitDictionary
