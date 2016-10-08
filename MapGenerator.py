@@ -117,7 +117,7 @@ def getMap(row, col):
     addType4(grids, row, col, 5)
     addRiver(grids, 0, row - 1, getPercentile(0, col, 0.5) - 2, getPercentile(0, col, 0.5) + 2, 5)
     addType3(grids, 0, 7, 7, 12, 1)
-    addType3(grids, row - 7, row - 1, col - 14, col - 8, 1)
+    addType3(grids, row - 8, row - 2, col - 14, col - 8, 1)
     addType1(grids, getPercentile(0, row, 0.7), getPercentile(0, row, 0.85), getPercentile(0, col, 0.2), getPercentile(0, col, 0.35))
     addType1(grids, getPercentile(0, row, 0.15), getPercentile(0, row, 0.3), getPercentile(0, col, 0.65), getPercentile(0, col, 0.8))
     addType2(grids, getPercentile(0, row, 0.3), getPercentile(0, row, 0.4), getPercentile(0, col, 0.8), getPercentile(0, col, 0.9))
