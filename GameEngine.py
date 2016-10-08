@@ -191,44 +191,43 @@ class GameEngine:
 
     # First calculates the enemy score of units - no of enemies within attack range of an unit
     def CalculateEnemyScore(self):
-        for r in range(self.row):
-            for c in range(self.col):
-                unit = self.gridUnits[r][c]
-                if (unit != C.EMPTY):
-                    nearbyCoordinates = Helper.GetAllWithinDistance(r,c,C.ATTACK_RANGE)
-                    enemyCount = 0
-                    for coor in nearbyCoordinates:
-                        otherUnit = self.gridUnits[coor[0]][coor[1]]
-                        if (otherUnit != C.EMPTY and otherUnit.playerID != unit.playerID):
-                            enemyCount+=1
-                    self.gridUnitEnemyScore[r][c] = enemyCount
+        for key, unit in self.unitDictionary.items():
+            r = unit.GetRow()
+            c = unit.GetCol()
+            nearbyCoordinates = Helper.GetAllWithinDistance(r,c,C.ATTACK_RANGE)
+            enemyCount = 0
+            for coor in nearbyCoordinates:
+                otherUnit = self.gridUnits[coor[0]][coor[1]]
+                if (otherUnit != C.EMPTY and otherUnit.playerID != unit.playerID):
+                    print(r,c,"VS",coor[0],coor[1])
+                    enemyCount+=1
+            self.gridUnitEnemyScore[r][c] = enemyCount
 
     # If a unit has enemies near him, check the enemy score of those enemies as well
     # If the enemy score of this unit is >= the minimum of all enemies' score, mark this unit for death
     def CheckDeath(self):
-        for r in range(self.row):
-            for c in range(self.col):
-                unit = self.gridUnits[r][c]
-                unitEnemyScore = self.gridUnitEnemyScore[r][c]
-                if (unit != C.EMPTY):
-                    nearbyCoordinates = Helper.GetAllWithinDistance(r,c,C.ATTACK_RANGE)
-                    minEnemyScore = 100
-                    for coor in nearbyCoordinates:
-                        otherUnit = self.gridUnits[coor[0]][coor[1]]
-                        otherUnitEnemyScore =  self.gridUnitEnemyScore[coor[0]][coor[1]]
-                        if (otherUnit != C.EMPTY and otherUnit.playerID != unit.playerID):
-                            minEnemyScore = min(minEnemyScore, otherUnitEnemyScore)
+        for key, unit in self.unitDictionary.items():
+            r = unit.GetRow()
+            c = unit.GetCol()
+            unitEnemyScore = self.gridUnitEnemyScore[r][c]
+            nearbyCoordinates = Helper.GetAllWithinDistance(r,c,C.ATTACK_RANGE)
+            minEnemyScore = 100
+            for coor in nearbyCoordinates:
+                otherUnit = self.gridUnits[coor[0]][coor[1]]
+                otherUnitEnemyScore =  self.gridUnitEnemyScore[coor[0]][coor[1]]
+                if (otherUnit != C.EMPTY and otherUnit.playerID != unit.playerID):
+                    minEnemyScore = min(minEnemyScore, otherUnitEnemyScore)
 
-                    if (minEnemyScore <= unitEnemyScore):
-                        self.gridUnitDeathMark[r][c] = 1
+            if (minEnemyScore <= unitEnemyScore):
+                self.gridUnitDeathMark[r][c] = 1
 
     # Apply all death marks to units
     def ApplyDeath(self):
-        for r in range(self.row):
-            for c in range(self.col):
-                unit = self.gridUnits[r][c]
-                if (unit != C.EMPTY and self.gridUnitDeathMark[r][c] == 1):
-                    self.KillUnit(unit.GetUnitID)
+        for key, unit in self.unitDictionary.items():
+            r = unit.GetRow()
+            c = unit.GetCol()
+            if (self.gridUnitDeathMark[r][c] == 1):
+                self.KillUnit(unit.GetUnitID)
         self.ResetGridUnits()
 
     # Adds a new unit owned by playerId, at [row, col] to unitDictionary
@@ -243,6 +242,7 @@ class GameEngine:
     # Deletes a unit with ID unitId from unitDictionary.
     # NOTE: Run ResetGridUnits after killing any unit to update the grid!
     def KillUnit(self, unitId):
+        print("Kill unitID", unitId)
         killedUnit = self.unitDictionary.pop(unitId, None)
         return killedUnit!=None
 
