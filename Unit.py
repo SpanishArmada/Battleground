@@ -4,8 +4,11 @@ class Unit:
     def __init__(self, unitID, playerID, rPos, cPos):
         self.unitID = unitID
         self.playerID = playerID
-        self.cPos = cPos
         self.rPos = rPos
+        self.cPos = cPos
+
+    def GetRow(self):
+        return self.rPos
 
     def GetUnitID(self):
         return self.unitID
@@ -16,17 +19,14 @@ class Unit:
     def GetCol(self):
         return self.cPos
 
-    def GetRow(self):
-        return self.rPos
-
     def SetUnitID(Self, unitID):
         self.unitID = unitID
 
     def SetPlayerID(self, playerID):
         self.playerID = playerID
 
-    def SetCol(self, cPos):
-        self.cPos = cPos
-
     def SetRow(self, rPos):
         self.rPos = rPos
+
+    def SetCol(self, cPos):
+        self.cPos = cPos
