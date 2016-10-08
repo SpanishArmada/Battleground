@@ -140,8 +140,10 @@ var drawWall = function (row, col) {
 var drawHive = function (row, col, playerId) {
     playerId = (typeof playerId === 'undefined' || playerId === -1 ? 3 : playerId);
     var relativeCoordinate = resolveCoordinate(row, col);
-    var x1 = topLeft[0] + relativeCoordinate[0] + gridProperties.width / 2;
-    var y1 = topLeft[1] + relativeCoordinate[1] + gridProperties.height / 2;
+    var x1 = topLeft[0] + relativeCoordinate[0];
+    var y1 = topLeft[1] + relativeCoordinate[1];
+    var xCenter = topLeft[0] + relativeCoordinate[0] + gridProperties.width / 2;
+    var yCenter = topLeft[1] + relativeCoordinate[1] + gridProperties.height / 2;
     ctx.save();
     ctx.fillStyle = gridProperties.dirtColor;
     ctx.fillRect(x1, y1, gridProperties.width, gridProperties.height);
@@ -150,7 +152,7 @@ var drawHive = function (row, col, playerId) {
     ctx.strokeStyle = hiveProperties.color[playerId];
     ctx.lineWidth = hiveProperties.border;
     ctx.beginPath();
-    ctx.arc(x1, y1, hiveProperties.radius, 0, 2*Math.PI);
+    ctx.arc(xCenter, yCenter, hiveProperties.radius, 0, 2*Math.PI);
     ctx.closePath();
     ctx.fill()
     ctx.stroke();
@@ -164,6 +166,10 @@ var drawHandlers = [
 ]
 
 var drawMap = function () {
+    ctx.save();
+    ctx.fillStyle = '#000000';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    ctx.restore();
     for(var row = 0; row < mapHeight; ++row) {
         for(var col = 0; col < mapWidth; ++col) {
             drawHandlers[map[row][col]](row, col);
@@ -243,4 +249,7 @@ var test = (function () {
 document.addEventListener('DOMContentLoaded', function (event) {
     // test.draw();
     // test.unitMovementDraw();
+    canvas.width = 640;
+    canvas.height = 640;
+    drawMap();
 })
