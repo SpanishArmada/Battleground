@@ -92,8 +92,8 @@ class SocketHandler(tornado.websocket.WebSocketHandler):
                     clients.remove(i)
                     break
         elif(msg_type == 2):
-            print(algoList)
-            data = {"type": 1, "algoList": algoList}
+            # print(algoList)
+            data = {"type": 1, "algoList": get_algo()}
             self.write_message(data)
         elif(msg_type == 3):
             result = GE.Start(getMap2(30, 30), algoList)
