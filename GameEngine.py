@@ -10,6 +10,7 @@ import copy as copy
 from os.path import isfile, join, dirname, splitext, abspath, split
 import imp, importlib
 import sys
+import traceback
 class GameEngine:
 
     # Init function
@@ -164,8 +165,10 @@ class GameEngine:
             try:
                 self.playerMovements[i] = self.playerObject[i].getAction(i, gridTerrainPlayer[i], gridUnitsPlayer[i], self.memoryList[i])
             except:
-                e = sys.exc_info()[0]
-                print(e)
+                print ("Exception in user code: Player ", i)
+                print ('-'*60)
+                traceback.print_exc(file=sys.stdout)
+                print ('-'*60)
                 self.playerMovements[i] = []
                 for key, unit in self.unitDictionary.items():
                     if(key == i):
