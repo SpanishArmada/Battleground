@@ -198,8 +198,8 @@ class GameEngine:
             enemyCount = 0
             for coor in nearbyCoordinates:
                 otherUnit = self.gridUnits[coor[0]][coor[1]]
-                if (otherUnit != C.EMPTY and otherUnit.playerID != unit.playerID):
-                    print(r,c,"VS",coor[0],coor[1])
+                if (otherUnit != C.EMPTY and otherUnit.GetPlayerID() != unit.GetPlayerID()):
+                    print(r,c,unit.GetPlayerID(),"VS",coor[0],coor[1],otherUnit.GetPlayerId())
                     enemyCount+=1
             self.gridUnitEnemyScore[r][c] = enemyCount
 
@@ -210,12 +210,15 @@ class GameEngine:
             r = unit.GetRow()
             c = unit.GetCol()
             unitEnemyScore = self.gridUnitEnemyScore[r][c]
+            print ("unit of player", unit.GetPlayerID(),"at",r,c,"Score=",unitEnemyScore)
+            if (unitEnemyScore == 0):
+                continue
             nearbyCoordinates = Helper.GetAllWithinDistance(r,c,C.ATTACK_RANGE)
             minEnemyScore = 100
             for coor in nearbyCoordinates:
                 otherUnit = self.gridUnits[coor[0]][coor[1]]
                 otherUnitEnemyScore =  self.gridUnitEnemyScore[coor[0]][coor[1]]
-                if (otherUnit != C.EMPTY and otherUnit.playerID != unit.playerID):
+                if (otherUnit != C.EMPTY and otherUnit.GetPlayerID() != unit.GetPlayerID()):
                     minEnemyScore = min(minEnemyScore, otherUnitEnemyScore)
 
             if (minEnemyScore <= unitEnemyScore):
@@ -227,7 +230,7 @@ class GameEngine:
             r = unit.GetRow()
             c = unit.GetCol()
             if (self.gridUnitDeathMark[r][c] == 1):
-                self.KillUnit(unit.GetUnitID)
+                self.KillUnit(unit.GetUnitID())
         self.ResetGridUnits()
 
     # Adds a new unit owned by playerId, at [row, col] to unitDictionary
