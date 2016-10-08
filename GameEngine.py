@@ -25,7 +25,7 @@ class GameEngine:
         self.unitDictionary = dict()
         self.unitCount = 0
         self.hiveList = []
-        self.memoryList = [0 for i in range(playerNum)]
+        self.memoryList = [{} for i in range(playerNum)]
         self.turnNumber = 0
 
         self.jsonDumper = JSONDumper()
