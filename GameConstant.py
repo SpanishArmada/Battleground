@@ -19,3 +19,6 @@ class GameConstant:
 
     # Ownership
     EMPTY = -1
+
+    # Game
+    RESPAWN = 3
