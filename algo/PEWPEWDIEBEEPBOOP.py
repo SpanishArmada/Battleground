@@ -58,7 +58,7 @@ class PEWPEWDIEBEEPBOOP:
             new_col = col + delta[1]
             if in_boundary(new_row, new_col):
                 return (new_row, new_col)
-            else return (row, col)
+            else: return (row, col)
 
         heatmap = []
         width, height = memory['size']
