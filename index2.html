@@ -4,7 +4,7 @@
         <link rel="stylesheet" href={{ static_url("style.css") }} />
     </head>
 <script>
-    var ws = new WebSocket("ws://localhost:8888/ws");
+    var ws = new WebSocket("battleground-spanish-armada.herokuapp.com/ws");
     var client_id;
 
     ws.onopen = function() {
