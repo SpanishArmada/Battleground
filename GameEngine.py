@@ -4,6 +4,7 @@ from Grid import Grid
 from Unit import Unit
 from Hive import Hive
 from GameConstant import GameConstant as C
+from JSONDumper import JSONDumper
 import HexagridHelper as Helper
 import copy as copy
 
@@ -13,11 +14,14 @@ class GameEngine:
         self.gridTerrainMain = [[C.EMPTY for i in range(col)] for j in range(row)]
         self.gridUnits = [[C.EMPTY for i in range(col)] for j in range(row)]
         self.unitDictionary = dict()
+        self.hiveList = []
         self.memoryList = [0 for i in range(playerNum)]
         self.playerNum = playerNum
         self.row = row
         self.col = col
         self.unitCount = 0
+        self.jsonDumper = JSONDumper()
+        self.turnNumber = 0
 
     def ResetGridUnits(self):
         self.gridUnits = [[C.EMPTY for i in range(self.col)] for j in range(self.row)]
@@ -35,8 +39,13 @@ class GameEngine:
         self.gridUnitEnemyScore = [[C.EMPTY for i in range(self.col)] for j in range(self.row)]
         self.gridUnitDeathMark = [[C.EMPTY for i in range(self.col)] for j in range(self.row)]
     
-    def Start(gridTerrainMain, playerObject):
+    def Start(self, gridTerrain, playerObject):
+        self.ReadTerrain(gridTerrain)
+        self.jsonDumper.InitializeMap(gridTerrain)
         self.playerObject = playerObject
+
+    def ReadTerrain(self, gridTerrain):
+
 
     def Update(self):
         self.ResetVariables()
@@ -55,25 +64,25 @@ class GameEngine:
                 if(tmpUnit != C.EMPTY):
                     listViewed = Helper.GetAllWithinDistance(i, j, C.VISION_RANGE)
                     for coor in listViewed:
-                        if(IsValidCoordinate(coor[0],coor[1])):
+                        if(self.IsValidCoordinate(coor[0],coor[1])):
                             self.gridFoW[tmpUnit.GetPlayerID()][coor[0]][coor[1]] = C.REVEALED
     
     def RunAI(self):
-        gridUnitsPlayer = [[[C.EMPTY for i in range(self.col)] for j in range(self.row)] k in range(self.playerNum)]
-        gridTerrainPlayer = [[[C.EMPTY for i in range(self.col)] for j in range(self.row)] k in range(self.playerNum)]
+        gridUnitsPlayer = [[[C.EMPTY for i in range(self.col)] for j in range(self.row)] for k in range(self.playerNum)]
+        gridTerrainPlayer = [[[C.EMPTY for i in range(self.col)] for j in range(self.row)] for k in range(self.playerNum)]
         
          # calculate parameters to pass
         for i in range(self.playerNum):
             for j in range(self.row):
                 for k in range(self.col):
-                    if(self.gridFoW[i][j][k] == REVEALED):
+                    if(self.gridFoW[i][j][k] == C.REVEALED):
                         gridUnitsPlayer[i][j][k] = copy.deepcopy(self.gridUnits[j][k])
                         gridTerrainPlayer[i][j][k] = copy.deepcopy(self.gridTerrainMain[j][k])
 
         # execute ai for each player
         # store player movement
         for i in range(self.playerNum):
-            self.playerMovements[i] = playerObject[i].getAction(gridUnitsPlayer[i], gridTerrainPlayer[i], memoryList[i])
+            self.playerMovements[i] = self.playerObject[i].getAction(gridUnitsPlayer[i], gridTerrainPlayer[i], self.memoryList[i])
 
 
     def MovementPhase(self):
@@ -87,7 +96,7 @@ class GameEngine:
                     oCol = curUnit.GetCol()
                     if(curUnit.GetPlayerID() == i):
                         nCoor = Helper.GetMoveTarget(oRow, oCol, mov.getMove())
-                        if(IsValidCoordinate(nCoor[0], nCoor[1]) and self.gridTerrainMain[nCoor[0]][nCoor[1]] != C.WALL):
+                        if(self.IsValidCoordinate(nCoor[0], nCoor[1]) and self.gridTerrainMain[nCoor[0]][nCoor[1]] != C.WALL):
                             curUnit.SetRow(nCoor[0])
                             curUnit.SetCol(nCoor[1])
         
@@ -96,11 +105,11 @@ class GameEngine:
             if(isDeathMatrix[curUnit.GetRow][curUnit.GetCol] == 0):
                 isDeathMatrix[curUnit.GetRow][curUnit.GetCol] == curUnit.getUnitID()
             else:
-                KillUnit(curUnit.getUnitID())
-                KillUnit(isDeathMatrix[curUnit.GetRow][curUnit.GetCol])
+                self.KillUnit(curUnit.getUnitID())
+                self.KillUnit(isDeathMatrix[curUnit.GetRow][curUnit.GetCol])
         
         # place on a new map
-        resetGridUnits() 
+        self.ResetGridUnits()
 
     def ActionPhase(self):
         self.CalculateEnemyScore()
@@ -164,7 +173,7 @@ class GameEngine:
         print(self.gridFoW[0][0][0])
 
     def WriteToFile(self):
-        pass
+        self.jsonDumper.Update(self.turnNumber, self.unitDictionary, self.hiveList)
         # store state for each turn
 
     
