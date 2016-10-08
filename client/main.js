@@ -25,6 +25,7 @@ var bgColor = '#000000';
 var gridProperties = {
     dirtColor: '#703500',
     wallColor: '#000000',
+    fogColor: '#666666',
     width: 16,
     height: 16,
     spacing: 2,
@@ -39,22 +40,22 @@ var unitProperties = {
         '#0000ff',
         '#00ff00',
     ],
-    radius: 6,
+    radius: 4,
 }
 
 var hiveProperties = {
     color: [
         '#7f7f7f',
-        '#cc0000',
-        '#0000cc',
-        '#00cc00',
+        '#7f0000',
+        '#00007f',
+        '#007f00',
     ],
     radius: 6,
     border: 4,
 }
 
-var mapWidth = 30;
-var mapHeight = 30;
+var mapWidth = 4;
+var mapHeight = 4;
 var map = [];
 
 var directions = ['ne', 'e', 'se','sw', 'w', 'nw'];
@@ -76,6 +77,29 @@ var resolution = [
         'sw': [1, 0],
     }
 ]
+
+var perspective = -1;
+var replayData = {
+    map: [[0,0,0,0], [0,0,0,0], [0,0,0,0], [0,0,0,0]],
+    turnData: [
+        {
+            unitData: [],
+            baseData: [[0,0,0],[3,3,1],[3,0,-1],[0,3,-1]],
+        },
+        {
+            unitData: [[0,0,0],[3,3,1]],
+            baseData: [[0,0,0],[3,3,1],[3,0,-1],[0,3,-1]],
+        },
+        {
+            unitData: [[0,1,0],[3,2,1]],
+            baseData: [[0,0,0],[3,3,1],[3,0,-1],[0,3,-1]],
+        },
+        {
+            unitData: [[1,0,0],[3,1,1],[0,0,0],[3,3,1]],
+            baseData: [[0,0,0],[3,3,1],[3,0,-1],[0,3,-1]],
+        },
+    ]
+};
 
 var inBoundary = function (row, col) {
     return 0 <= row && row < mapHeight
@@ -158,7 +182,7 @@ var drawHive = function (row, col, playerId) {
     ctx.restore();
 }
 
-var drawMap = function () {
+var drawMap = function (objects) {
     ctx.save();
     ctx.fillStyle = '#000000';
     ctx.fillRect(0, 0, canvas.width, canvas.height);
@@ -175,8 +199,38 @@ var drawMap = function () {
             }
         }
     }
+
+    if(typeof objects === 'undefined') {
+        return;
+    }
+
+    objects.baseData.forEach(function (base, index) {
+        var baseRow = base[0];
+        var baseCol = base[1];
+        var playerId = base[2]
+            // This is fucking retarded
+            +1;
+        drawHive(baseRow, baseCol, playerId)
+    })
+
+    objects.unitData.forEach(function (unit, index) {
+        var unitRow = unit[0];
+        var unitCol = unit[1];
+        var playerId = unit[2];
+        drawUnit(unitRow, unitCol, playerId)
+    })
 }
 
+var playReplay = function () {
+    map = replayData.map;
+    drawMap();
+    var drawInterval = 450;
+    replayData.turnData.forEach(function (objects, index) {
+        setTimeout(function() {
+            drawMap(objects);
+        }, index * drawInterval + drawInterval);
+    })
+}
 
 var test = (function () {
     var mapWidth = 30;
@@ -238,13 +292,13 @@ var test = (function () {
         drawMap();
         drawUnit(position[0], position[1], 0);
         var orders = ['ne', 'ne', 'ne', 'e', 'e', 'e', 'se', 'se', 'se', 'sw', 'sw', 'sw', 'w', 'w', 'w', 'nw', 'nw', 'nw'];
-        var drawDelay = 450;
+        var drawInterval = 450;
         orders.forEach(function (direction, index) {
             setTimeout(function () {
                 position = resolve(position[0], position[1], direction);
                 drawMap();
                 drawUnit(position[0], position[1], 0);
-            }, (index + 1) * drawDelay)
+            }, (index + 1) * drawInterval)
         })
     }
 
@@ -259,5 +313,6 @@ document.addEventListener('DOMContentLoaded', function (event) {
     canvas.height = 640;
     // test.draw();
     // test.unitMovementDraw();
-    drawMap();
+    // drawMap();
+    playReplay();
 })
