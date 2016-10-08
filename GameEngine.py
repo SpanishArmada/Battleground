@@ -12,6 +12,7 @@ class GameEngine:
         self.gridTerrainMain = [[C.EMPTY for i in range(col)] for j in range(row)]
         self.gridUnits = [[C.EMPTY for i in range(col)] for j in range(row)]
         self.unitDictionary = dict()
+        self.memoryList = [0 for i in range(playerNum)]
         self.playerNum = playerNum
         self.row = row
         self.col = col
@@ -32,6 +33,9 @@ class GameEngine:
         # Variables for action phase
         self.gridUnitEnemyScore = [[C.EMPTY for i in range(self.col)] for j in range(self.row)]
         self.gridUnitDeathMark = [[C.EMPTY for i in range(self.col)] for j in range(self.row)]
+    
+    def Start(gridTerrainMain, playerObject):
+        self.playerObject = playerObject
 
     def Update(self):
         self.ResetVariables()
@@ -46,36 +50,42 @@ class GameEngine:
         # generate map for each player
         for i in range(self.row):
             for j in range(self.col):
-                tmpPlayer = gridUnits[i][j].GetPlayerID()
-                if(tmpPlayer != C.EMPTY):
+                tmpUnit = self.gridUnits[i][j]
+                if(tmpUnit != C.EMPTY):
                     listViewed = Helper.GetAllWithinDistance(i, j, C.VISION_RANGE)
                     for coor in listViewed:
                         if(IsValidCoordinate(coor[0],coor[1])):
-                            gridFoW[tmpPlayer][coor[0]][coor[1]] = 1
+                            self.gridFoW[tmpUnit.GetPlayerID()][coor[0]][coor[1]] = C.REVEALED
     
     def RunAI(self):
-        pass
         # calculate parameters to pass
+        gridUnitsPlayer = [[[C.EMPTY for i in range(self.col)] for j in range(self.row)] k in range(self.playerNum)]
+        gridTerraiMain = [[[C.EMPTY for i in range(self.col)] for j in range(self.row)] k in range(self.playerNum)]
+
+        for i in range(self.playerNum):
+            for j in range(self.row):
+                for k in range(self.col):
+                    if(self.gridFoW[i][j][k] == 1)
         # execute ai for each player
         # store movement
 
     def MovementPhase(self):
-        isDeathMatrix = [[0 for i in range self.col] in range self.row]
+        isDeathMatrix = [[0 for i in range(self.col)] in range(self.row)]
 
         for i in range(self.playerNum):
             for mov in self.playerMovements[i]:
-                if(mov.getUnitID in self.unitDictionary)
-                    curUnit = unitDictionary[mov.getUnitID()]
+                if(self.unitDictionary.has_key(mov.getUnitID)):
+                    curUnit = self.unitDictionary[mov.getUnitID()]
                     oRow = curUnit.GetRow()
                     oCol = curUnit.GetCol()
                     if(curUnit.GetPlayerID() == i):
                         nCoor = Helper.GetMoveTarget(oRow, oCol, mov.getMove())
-                        if(IsValidCoordinate(nCoor[0], nCoor[1]) and gridTerrainMain[nCoor[0]][nCoor[1]] != C.WALL):
+                        if(IsValidCoordinate(nCoor[0], nCoor[1]) and self.gridTerrainMain[nCoor[0]][nCoor[1]] != C.WALL):
                             curUnit.SetRow(nCoor[0])
                             curUnit.SetCol(nCoor[1])
         
         # check collision
-        for curUnit in unitDictionary:
+        for curUnit in self.unitDictionary:
             if(isDeathMatrix[curUnit.GetRow][curUnit.GetCol] == 0):
                 isDeathMatrix[curUnit.GetRow][curUnit.GetCol] == curUnit.getUnitID()
             else:
