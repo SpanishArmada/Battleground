@@ -50,6 +50,7 @@ class GameEngine:
     # Function to be called. Simulates the game and returns the json dump
     def Start(self, gridTerrain, playerObject):
         path = dirname(abspath(__file__)) + '\\' + "algo" + '\\'
+        print("Selected", playerObject[0], playerObject[1])
         playerObject[0] = self.LoadFromFile(path + playerObject[0], playerObject[0][:-3])
         playerObject[1] = self.LoadFromFile(path + playerObject[1], playerObject[1][:-3])
         self.ReadTerrain(gridTerrain)

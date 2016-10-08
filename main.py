@@ -92,7 +92,6 @@ class SocketHandler(tornado.websocket.WebSocketHandler):
                     clients.remove(i)
                     break
         elif(msg_type == 2):
-            algoList = get_algo()
             print(algoList)
             data = {"type": 1, "algoList": algoList}
             self.write_message(data)
