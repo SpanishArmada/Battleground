@@ -1,0 +1,62 @@
+<html>
+    <head>
+        <script type="text/javascript" src="jquery.js"></script>
+         <script type="text/javascript" src="index.js"></script>
+         
+    </head>
+<script>
+    var ws = new WebSocket("ws://localhost:8888/ws");
+    var client_id;
+    // 0 for index1
+    // 1 to terminate
+    // 2 for index2
+    ws.onopen = function() {
+        // pass row and col here
+        console.log("Index 2 in")
+        ws.send(JSON.stringify({type: 2}));
+    };
+    ws.onmessage = function (evt) {
+        data = JSON.parse(evt.data);
+        if(data.type == 0) {
+            console.log("id assigned")
+            client_id = data.client_id; 
+        }
+        else if(data.type == 1) {
+            console.log()
+            var algo1 = document.getElementById("algo1");
+            var algo2 = document.getElementById("algo2");
+            var options = data.algoList; 
+            console.log(data.algoList)
+            for(var i = 0; i < options.length; i++) {
+                var opt = options[i];
+                var el = document.createElement("option");
+                el.textContent = opt;
+                el.value = opt;
+                var el2 = document.createElement("option");
+                el2.textContent = opt;
+                el2.value = opt;
+                algo1.appendChild(el);
+                algo2.appendChild(el2);
+            }
+        }
+    };
+
+    window.onbeforeunload = function() {
+        ws.send(JSON.stringify({type: 1, client_id: client_id}));
+        ws.onclose = function () {}; // disable onclose handler first
+        ws.close()
+    };
+    
+</script>
+Upload Successful!
+<form id="algoForm" method="POST" action="simulate" enctype="multipart/form-data">
+    First Algorithm
+  <select id="algo1" name="algo1">
+  </select>
+
+    Second Algorithm
+  <select id="algo2" name="algo2">      
+  </select>
+  <input type="submit" value="submit"/>
+</form>
+</html>

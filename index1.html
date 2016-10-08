@@ -1,0 +1,32 @@
+<html>
+<script>
+    var ws = new WebSocket("ws://localhost:8888/ws");
+    var client_id;
+    ws.onopen = function() {
+        // pass row and col here
+        ws.send(JSON.stringify({type: 0}));
+    };
+    ws.onmessage = function (evt) {
+        data = JSON.parse(evt.data);
+        if(data.type == 0) {
+            client_id = data.client_id; 
+        }
+
+    };
+
+    window.onbeforeunload = function() {
+        ws.send(JSON.stringify({type: 1, client_id: client_id}));
+        ws.onclose = function () {}; // disable onclose handler first
+        ws.close()
+    };
+    
+</script>
+<form method="POST" action="upload" enctype="multipart/form-data">
+            File1: <input type="file" name="code1" />
+            File2: <input type="file" name="code2" />
+            <input type="submit" value="submit"/>
+        </form>
+<form method="POST" action="skipUpload" enctype="multipart/form-data">
+<input type="submit" value="Skip"/>
+</form>
+</html>
