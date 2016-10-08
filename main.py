@@ -41,18 +41,16 @@ class Upload(tornado.web.RequestHandler):
     global clients
     def post(self):
         code1 = self.request.files['code1'][0]
-        code2 = self.request.files['code2'][0]
+        # code2 = self.request.files['code2'][0]
         fname1 = code1['filename']
-        fname2 = code2['filename']
+        # fname2 = code2['filename']
         extn1 = splitext(fname1)[1]
-        extn2 = splitext(fname2)[1]
-        # if want to use random file name
-        # cname = str(uuid.uuid4()) + extn
+        # extn2 = splitext(fname2)[1]
         
         with open(path + fname1, 'wb') as writeFile:
             writeFile.write(code1['body'])
-        with open(path + fname2, 'wb') as writeFile:
-            writeFile.write(code2['body'])
+        # with open(path + fname2, 'wb') as writeFile:
+        #     writeFile.write(code2['body'])
         self.render("index2.html")
         
 

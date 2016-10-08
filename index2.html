@@ -1,15 +1,12 @@
 <html>
     <head>
-        <script type="text/javascript" src="jquery.js"></script>
-         <script type="text/javascript" src="index.js"></script>
-         
+         <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+        <link rel="stylesheet" href={{ static_url("style.css") }} />
     </head>
 <script>
     var ws = new WebSocket("ws://localhost:8888/ws");
     var client_id;
-    // 0 for index1
-    // 1 to terminate
-    // 2 for index2
+
     ws.onopen = function() {
         // pass row and col here
         console.log("Index 2 in")
@@ -48,15 +45,26 @@
     };
     
 </script>
-Upload Successful!
-<form id="algoForm" method="POST" action="simulate" enctype="multipart/form-data">
-    First Algorithm
-  <select id="algo1" name="algo1">
-  </select>
+<body>
+    <header id="header">
+        <h1>Battleground</h1>
+        <div id="tag">
+            <div id="tagline">AI Challenge</div>
+        </div>
+        <div id="game-info">Source code: <a href="https://github.com/SpanishArmada/Battleground">Our Code Here!</a>
+        </div>
+    </header>
+    Upload Successful!
+    <form id="algoForm" method="POST" action="simulate" enctype="multipart/form-data" class="form-dropdown">
+        First Algorithm
+    <select id="algo1" name="algo1" class="form-dropdown">
+    </select>
 
-    Second Algorithm
-  <select id="algo2" name="algo2">      
-  </select>
-  <input type="submit" value="submit"/>
-</form>
+        Second Algorithm
+    <select id="algo2" name="algo2">      
+    </select>
+    <input type="submit" value="Submit" class="btn btn-default" style="margin:5px"/>
+    
+    </form>
+    </body>
 </html>
