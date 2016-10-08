@@ -3,7 +3,7 @@
 from GameConstant import GameConstant
 
 class Hive:
-    def __init__(self, cPos, rPos, playerID):
+    def __init__(self, rPos, cPos, playerID):
         self.cPos = cPos
         self.rPos = rPos
         self.playerID = playerID
