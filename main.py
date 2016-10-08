@@ -10,6 +10,7 @@ from os.path import isfile, join, dirname, splitext, abspath, split
 import imp, importlib
 from GameEngine import GameEngine
 from MapGenerator import *
+define("port", default=8888, help="run on the given port", type=int)
 
 clients = []
 algoList = []
