@@ -249,10 +249,11 @@ class GameEngine:
             nearbyCoordinates = Helper.GetAllWithinDistance(r,c,C.ATTACK_RANGE)
             minEnemyScore = 100
             for coor in nearbyCoordinates:
-                otherUnit = self.gridUnits[coor[0]][coor[1]]
-                otherUnitEnemyScore =  self.gridUnitEnemyScore[coor[0]][coor[1]]
-                if (otherUnit != C.EMPTY and otherUnit.GetPlayerID() != unit.GetPlayerID()):
-                    minEnemyScore = min(minEnemyScore, otherUnitEnemyScore)
+                if (self.IsValidCoordinate(coor[0], coor[1])):
+                    otherUnit = self.gridUnits[coor[0]][coor[1]]
+                    otherUnitEnemyScore =  self.gridUnitEnemyScore[coor[0]][coor[1]]
+                    if (otherUnit != C.EMPTY and otherUnit.GetPlayerID() != unit.GetPlayerID()):
+                        minEnemyScore = min(minEnemyScore, otherUnitEnemyScore)
 
             if (minEnemyScore <= unitEnemyScore):
                 self.gridUnitDeathMark[r][c] = 1

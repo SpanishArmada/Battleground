@@ -212,7 +212,7 @@ def getMap3(row,col):
     addHive(grids, row - 2 - 1, col - 5 - 1, -1, False)  #not taken
     # addType4(grids, row, col, 5)
     # addCross(grids, 12, 12, 7)
-    addCross(grids, getPercentile(0, row, 0.4), getPercentile(0, col, 0.4), 12)
+    addCross(grids, getPercentile(0, row, 0.45), getPercentile(0, col, 0.5), 5)
     addType4(grids, row, col, 5)
     addType3(grids, 0, getPercentile(0, row, 0.25), getPercentile(0, col, 0.25), getPercentile(0, col, 0.45), 1)
     addType3(grids, getPercentile(0, row, 0.75), row - 1, getPercentile(0, col, 0.65), getPercentile(0, col, 0.85), 1)
