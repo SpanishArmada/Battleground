@@ -22,7 +22,30 @@ class PEWPEWDIEBEEPBOOP:
         init_memory()
         width, height = memory['size']
         explored = memory['explored']
+        explore_targets = [
+            (0, 0),
+            (0, 29),
+            (29, 0),
+            (29, 29),
 
+            (3, 4),
+            (3, 9),
+            (3, 15),
+            (3, 23),
+            (3, 27),
+            (15, 2),
+            (15, 9),
+            (15, 15),
+            (15, 23),
+            (15, 27),
+            (26, 4),
+            (26, 9),
+            (26, 15),
+            (26, 23),
+            (26, 27),
+            ]
+
+        UNEXPLORED = -1
         WALL = 1
         # Another overhead, but meh
         resolution = [{
@@ -101,39 +124,50 @@ class PEWPEWDIEBEEPBOOP:
 
         def _(x, denominator):
             return math.exp(-x**2./denominator)
+        def __(x):
+            return 1./math.sqrt(x+1.)
+        def ___(x):
+            return 1./(x+1.)
         # Capture all freebies
-        for freebie_row, freebie_col in freebies:
-            visited = [[-1] * width for i in range(height)]
-            q = deque()
-            q.append((freebie_row, freebie_col))
-            visited[freebie_row][freebie_col] = 0
-            while q:
-                row, col = q.popleft()
-                distance = visited[row][col]
-                heatmap[row][col] += _(distance, 1024.)
-                for direction in directions:
-                    new_row, new_col = resolve(row, col, direction)
-                    if explored[new_row][new_col] != WALL \
-                        and visited[new_row][new_col] == -1:
-                        visited[new_row][new_col] = distance + 1
-                        q.append((new_row, new_col))
+        # for freebie_row, freebie_col in freebies:
+        #     visited = [[-1] * width for i in range(height)]
+        #     q = deque()
+        #     q.append((freebie_row, freebie_col))
+        #     visited[freebie_row][freebie_col] = 0
+        #     while q:
+        #         row, col = q.popleft()
+        #         distance = visited[row][col]
+        #         # heatmap[row][col] += _(distance, 1024.)
+        #         heatmap[row][col] += __(distance)
+        #         for direction in directions:
+        #             new_row, new_col = resolve(row, col, direction)
+        #             if explored[new_row][new_col] != WALL \
+        #                 and visited[new_row][new_col] == -1:
+        #                 visited[new_row][new_col] = distance + 1
+        #                 q.append((new_row, new_col))
 
-        for unexplored_row, unexplored_col in unexplored:
+        # for unexplored_row, unexplored_col in unexplored:
+        for target_row, target_col in explore_targets:
+            if explored[target_row][target_col] != UNEXPLORED:
+                continue
+
             visited = [[-1] * width for i in range(height)]
             q = deque()
-            q.append((unexplored_row, unexplored_col))
-            visited[unexplored_row][unexplored_col] = 0
+            q.append((target_row, target_col))
+            visited[target_row][target_col] = 0
             while q:
                 row, col = q.popleft()
                 distance = visited[row][col]
-                heatmap[row][col] += _(distance, 256.)
-                assert heatmap[row][col] > 0., 'wtf?'
+                # heatmap[row][col] += _(distance, 256.)
+                heatmap[row][col] += __(distance)
                 for direction in directions:
                     new_row, new_col = resolve(row, col, direction)
                     if explored[new_row][new_col] != WALL \
                         and visited[new_row][new_col] == -1:
                         visited[new_row][new_col] = distance + 1
                         q.append((new_row, new_col))
+            # One point of interest at a time
+            break
 
         for their_row, their_col in theirs:
             visited = [[-1] * width for i in range(height)]
@@ -143,13 +177,18 @@ class PEWPEWDIEBEEPBOOP:
             while q:
                 row, col = q.popleft()
                 distance = visited[row][col]
-                heatmap[row][col] += _(distance, 64.)
+                # heatmap[row][col] += _(distance, 64.)
+                heatmap[row][col] += __(distance)
                 for direction in directions:
                     new_row, new_col = resolve(row, col, direction)
                     if explored[new_row][new_col] != WALL \
                         and visited[new_row][new_col] == -1:
                         visited[new_row][new_col] = distance + 1
                         q.append((new_row, new_col))
+        print len(us)
+        print heatmap[17][-4:]
+        print heatmap[18][-4:]
+        print heatmap[19][-4:]
         results = []
         # Your code here!
         final_position = set()
@@ -157,7 +196,7 @@ class PEWPEWDIEBEEPBOOP:
             direction_max = 'na'
             row_max = unit_row
             col_max = unit_col
-            max_heat = -1e99
+            max_heat = heatmap[unit_row][unit_col]
             for direction in directions:
                 new_row, new_col = resolve(unit_row, unit_col, direction)
                 if (new_row, new_col) not in final_position \
@@ -168,6 +207,7 @@ class PEWPEWDIEBEEPBOOP:
                     col_max = new_col
                     direction_max = direction
             final_position.add((row_max, col_max))
+            print unit_row, unit_col, row_max, col_max, direction_max, max_heat
             results.append(Movement(unit_id, direction_mapper[direction_max]))
         print '%.9fs' % (time.time() - start_time)
         return results
