@@ -155,6 +155,31 @@ var drawUnit = function (row, col, playerId) {
     ctx.restore();
 }
 
+var drawDead = function (row, col, playerId) {
+    if (playerId == 100){
+        ctx.strokeStyle = '#ffffff';
+    } else {
+        ctx.strokeStyle = unitProperties.color[playerId];
+    }
+    console.log(row,col,playerId,ctx.strokeStyle);
+    var relativeCoordinate = resolveCoordinate(row, col);
+    var margin = 2;
+    var deadDist = 12;
+    var x1 = topLeft[0] + relativeCoordinate[0] + margin;
+    var y1 = topLeft[1] + relativeCoordinate[1] + margin;
+    ctx.save();
+    ctx.beginPath();
+    ctx.moveTo(x1, y1);
+    ctx.lineTo(x1 + deadDist, y1 + deadDist);
+    ctx.moveTo(x1 + deadDist, y1);
+    ctx.lineTo(x1, y1 + deadDist);
+    ctx.lineWidth=3;
+    ctx.stroke();
+    ctx.closePath();
+    ctx.restore();
+}
+
+
 var drawEmpty = function (row, col) {
     var relativeCoordinate = resolveCoordinate(row, col);
     var x1 = topLeft[0] + relativeCoordinate[0];
@@ -216,7 +241,7 @@ var drawHive = function (row, col, playerId) {
     ctx.beginPath();
     ctx.arc(xCenter, yCenter, hiveProperties.radius, 0, 2*Math.PI);
     ctx.closePath();
-    ctx.fill()
+    ctx.fill();
     ctx.stroke();
     ctx.restore();
 }
@@ -250,6 +275,13 @@ var drawMap = function (objects) {
             // This is fucking retarded
             +1;
         drawHive(baseRow, baseCol, playerId)
+    })
+
+    objects.deadData.forEach(function (dead, index){
+        var deadRow = dead[0];
+        var deadCol = dead[1];
+        var playerId = dead[2];
+        drawDead(deadRow, deadCol, playerId)
     })
 
     objects.unitData.forEach(function (unit, index) {

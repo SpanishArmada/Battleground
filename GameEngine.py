@@ -290,9 +290,10 @@ class GameEngine:
         killedUnit = self.unitDictionary.pop(unitId, None)
         if (killedUnit != None):
             playerOwner = killedUnit.GetPlayerID()
+            print(killedUnit.GetRow(), killedUnit.GetCol(), killedUnit.GetPlayerID(),self.gridDeathPositions[killedUnit.GetRow()][killedUnit.GetCol()])
             if (self.gridDeathPositions[killedUnit.GetRow()][killedUnit.GetCol()] == -1):
                 self.gridDeathPositions[killedUnit.GetRow()][killedUnit.GetCol()] = playerOwner
-            else:
+            elif (self.gridDeathPositions[killedUnit.GetRow()][killedUnit.GetCol()] != playerOwner):
                 self.gridDeathPositions[killedUnit.GetRow()][killedUnit.GetCol()] = 100 # Multiple players' units died here
         return killedUnit!=None
 
