@@ -304,20 +304,23 @@ class GameEngine:
     def UpdateArena(self):
         # update timer for each hives
         for hive in self.hiveList:
-            if(hive.GetPlayerID() != C.EMPTY):
-                unitOnTop = self.gridUnits[hive.GetRow()][hive.GetCol()]
+            unitOnTop = self.gridUnits[hive.GetRow()][hive.GetCol()]
 
-                if(unitOnTop != C.EMPTY):
-                    if(unitOnTop.GetPlayerID() != hive.GetPlayerID()):
-                        hive.SetNewPlayer(unitOnTop.GetPlayerID())
-                        continue
-                    else:
-                        freeOnTop = False
+            if(unitOnTop != C.EMPTY):
+                if(unitOnTop.GetPlayerID() != hive.GetPlayerID()):
+                    hive.SetNewPlayer(unitOnTop.GetPlayerID())
+                    self.gridTerrainMain[hive.GetRow()][hive.GetCol()] = C.PLAYER_HIVE + hive.GetPlayerID()
+                    continue
                 else:
-                    freeOnTop = True
-                
+                    freeOnTop = False
+            else:
+                freeOnTop = True
+
+            if(hive.GetPlayerID() != C.EMPTY):
                 if(hive.IncrTimer(freeOnTop)):
                     self.AddUnit(hive.GetPlayerID(), hive.GetRow(), hive.GetCol())
+
+
 
     # Updates the JSON every turn with the turn's arena status
     def UpdateJSON(self):
