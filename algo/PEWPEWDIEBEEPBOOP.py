@@ -101,6 +101,7 @@ class PEWPEWDIEBEEPBOOP:
             for col in range(width):
                 heatmap[row].append(0.)
                 g = grids[row][col]
+
                 if g != -1: # Explored!
                     explored[row][col] = g
                     if g < 9:
@@ -185,10 +186,13 @@ class PEWPEWDIEBEEPBOOP:
                         and visited[new_row][new_col] == -1:
                         visited[new_row][new_col] = distance + 1
                         q.append((new_row, new_col))
-        print len(us)
-        print heatmap[17][-4:]
-        print heatmap[18][-4:]
-        print heatmap[19][-4:]
+        # print len(us)
+        # print heatmap[17][-4:]
+        # print heatmap[18][-4:]
+        # print heatmap[19][-4:]
+        # print grids[17][-5:], explored[17][-5:]
+        # print grids[18][-5:], explored[18][-5:]
+        # print grids[19][-5:], explored[19][-5:]
         results = []
         # Your code here!
         final_position = set()
@@ -199,16 +203,16 @@ class PEWPEWDIEBEEPBOOP:
             max_heat = heatmap[unit_row][unit_col]
             for direction in directions:
                 new_row, new_col = resolve(unit_row, unit_col, direction)
+                # print unit_row, unit_col, row_max, col_max, direction_max, max_heat, new_row, new_col, heatmap[new_row][new_col], (new_row, new_col) not in final_position, explored[new_row][new_row], grids[new_row][new_col]
                 if (new_row, new_col) not in final_position \
-                    and explored[new_row][new_row] != WALL \
+                    and explored[new_row][new_col] != WALL \
                     and heatmap[new_row][new_col] > max_heat:
-                    print 'Update!'
+                    # print 'Update!'
                     max_heat = heatmap[new_row][new_col]
                     row_max = new_row
                     col_max = new_col
                     direction_max = direction
             final_position.add((row_max, col_max))
-            print unit_row, unit_col, row_max, col_max, direction_max, max_heat
             results.append(Movement(unit_id, direction_mapper[direction_max]))
         print '%.9fs' % (time.time() - start_time)
         return results
