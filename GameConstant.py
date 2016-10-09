@@ -23,3 +23,9 @@ class GameConstant:
     # FOW
     HIDDEN = -1
     REVEALED = 1
+
+    # Winning conditions
+    WINCON_WIPEOUT = "By Wipeout"
+    WINCON_HIVESCORE = "By Base Control"
+    WINCON_UNITSCORE = "By Unit Control"
+    WINCON_TIE = "Tie"

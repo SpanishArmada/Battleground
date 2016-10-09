@@ -18,17 +18,34 @@ class GameEngine:
         self.row = row
         self.col = col
         self.playerNum = playerNum
-
         self.gridTerrainMain = [[C.EMPTY for i in range(col)] for j in range(row)]
         self.gridUnits = [[C.EMPTY for i in range(col)] for j in range(row)]
-
         self.unitDictionary = dict()
         self.unitCount = 0
         self.hiveList = []
         self.memoryList = [{} for i in range(playerNum)]
         self.turnNumber = 0
+        self.hiveScore = [0 for i in range(playerNum)]
+        self.unitScore = [0 for i in range(playerNum)]
 
         self.jsonDumper = JSONDumper()
+
+    # Resets variables for an update cycle
+    def ResetVariables(self):
+        self.gridFoW = [[[C.EMPTY for i in range(self.col)] for j in range(self.row)] for k in range(self.playerNum)]
+        self.playerMovements = [C.EMPTY for i in range(self.playerNum)]
+        self.gridUnitEnemyScore = [[C.EMPTY for i in range(self.col)] for j in range(self.row)]
+        self.gridUnitDeathMark = [[C.EMPTY for i in range(self.col)] for j in range(self.row)]
+        self.gridDeathPositions = [[C.EMPTY for i in range(self.col)] for j in range(self.row)]
+        self.turnHiveScore = [0 for i in range(self.playerNum)]
+        self.turnUnitScore = [0 for i in range(self.playerNum)]
+
+    # Clears gridUnits and recalculates it based on unitDictionary
+    # To be called whenever a unitDictionary is modified (a unit is moved/killed)
+    def ResetGridUnits(self):
+        self.gridUnits = [[C.EMPTY for i in range(self.col)] for j in range(self.row)]
+        for key, unit in self.unitDictionary.items():
+            self.gridUnits[unit.GetRow()][unit.GetCol()] = unit
 
 
     def LoadFromFile(self, filepath, expectedClass):
@@ -72,13 +89,16 @@ class GameEngine:
     # True if ending condition for the game has been fulfilled
     # Either a) Turn limit reached, or b) all hives+units belong to one player
     def GameHasEnded(self):
-        if(self.TurnExceeded()):
+        pid = self.OnePlayerLeft()
+        if (self.OnePlayerLeft() != C.EMPTY):
+            self.jsonDumper.SetWinner(pid, C.WINCON_WIPEOUT);
             return True
-        elif(self.OnePlayerLeft()):
+        elif(self.TurnExceeded()):
+            self.CheckWinner()
             return True
         else:
             return False
-    
+
     # check if turn limit exceeded
     def TurnExceeded(self):
         return (self.turnNumber > C.TURN_LIMIT)
@@ -94,14 +114,14 @@ class GameEngine:
                 continue
 
             if(curID != playerLeft and curID != C.EMPTY):
-                return False
+                return C.EMPTY
 
         for key, unit in self.unitDictionary.items():
             curID = unit.GetPlayerID()
             if(curID != playerLeft and curID != C.EMPTY):
-                return False
+                return C.EMPTY
 
-        return True   
+        return playerLeft
 
     # Main function to be called per turn.
     # Performs everything in order.
@@ -113,21 +133,6 @@ class GameEngine:
         self.UpdateArena()
         self.UpdateJSON()
         self.turnNumber += 1
-
-    # Resets variables for an update cycle
-    def ResetVariables(self):
-        self.gridFoW = [[[C.EMPTY for i in range(self.col)] for j in range(self.row)] for k in range(self.playerNum)]
-        self.playerMovements = [C.EMPTY for i in range(self.playerNum)]
-        self.gridUnitEnemyScore = [[C.EMPTY for i in range(self.col)] for j in range(self.row)]
-        self.gridUnitDeathMark = [[C.EMPTY for i in range(self.col)] for j in range(self.row)]
-        self.gridDeathPositions = [[C.EMPTY for i in range(self.col)] for j in range(self.row)]
-
-    # Clears gridUnits and recalculates it based on unitDictionary
-    # To be called whenever a unitDictionary is modified (a unit is moved/killed)
-    def ResetGridUnits(self):
-        self.gridUnits = [[C.EMPTY for i in range(self.col)] for j in range(self.row)]
-        for key, unit in self.unitDictionary.items():
-            self.gridUnits[unit.GetRow()][unit.GetCol()] = unit
 
     # Calculates each player's fog of war
     def CalculateFoW(self):
@@ -315,5 +320,55 @@ class GameEngine:
 
     # Updates the JSON every turn with the turn's arena status
     def UpdateJSON(self):
-        self.jsonDumper.Update(self.unitDictionary, self.hiveList, self.gridDeathPositions)
+        self.CountPlayerScore()
+        self.jsonDumper.Update(self.unitDictionary, self.hiveList, self.gridDeathPositions, self.turnHiveScore, self.turnUnitScore)
         # store state for each turn
+
+    # Update counter of players' no. of hives and units
+    def CountPlayerScore(self):
+        for hive in self.hiveList:
+            if (hive.GetPlayerID() != C.EMPTY):
+                self.turnHiveScore[hive.GetPlayerID()] += 1
+
+        for key,unit in self.unitDictionary.items():
+            if (unit.GetPlayerID() != C.EMPTY):
+                self.turnUnitScore[unit.GetPlayerID()] += 1
+
+        for i in range(self.playerNum):
+            self.hiveScore[i] += self.turnHiveScore[i]
+            self.unitScore[i] += self.turnUnitScore[i]
+
+    # In case of turn limit, find winner based on score
+    # Check hive score first, if tie check unit score, if still tied then return tie.
+    def CheckWinner(self):
+        maxscore = 0
+        winnerId = -1
+        tie = False
+        for i in range(len(self.hiveScore)):
+            if (self.hiveScore[i] > maxscore):
+                maxscore = self.hiveScore[i]
+                winnerId = i
+                tie = False
+            elif (self.hiveScore[i] == maxscore):
+                tie = True
+
+        if (not tie):
+            self.jsonDumper.SetWinner(winnerId, C.WINCON_HIVESCORE)
+            return
+
+        maxscore = 0
+        winnerId = -1
+        tie = False
+        for i in range(len(self.unitScore)):
+            if (self.unitScore[i] > maxscore):
+                maxscore = self.unitScore[i]
+                winnerId = i
+                tie = False
+            elif (self.unitScore[i] == maxscore):
+                tie = True
+
+        if (not tie):
+            self.jsonDumper.SetWinner(winnerId, C.WINCON_UNITSCORE)
+            return
+
+        self.jsonDumper.SetWinner(-1, C.WINCON_TIE)
