@@ -13,8 +13,8 @@ class keepmovingforward:
         self.isOccupied = [[False for i in range(maxcol)] for j in range(maxrow)]
         results = []
         counter = 0
-        for i in range(maxcol-1,-1,-1):
-            for j in range(maxrow):
+        for i in range(self.maxcol-1,-1,-1):
+            for j in range(self.maxrow):
                 if (isinstance(units[j][i], int)):
                     continue
                 if units[j][i].GetPlayerID() == pid:
