@@ -5,10 +5,12 @@ from Unit import *
 from HexagridHelper import *
 
 import math
+import time
 from collections import deque
 
 class PEWPEWDIEBEEPBOOP:
     def getAction(self, pid, grids, units, memory):
+        start_time = time.time()
         # Overhead, but not so much
         def init_memory():
             if 'explored' not in memory:
@@ -18,7 +20,10 @@ class PEWPEWDIEBEEPBOOP:
                 width = len(grids[0])
                 memory['size'] = (width, height)
         init_memory()
+        width, height = memory['size']
+        explored = memory['explored']
 
+        WALL = 1
         # Another overhead, but meh
         resolution = [{
             'ne': (-1, 0),
@@ -49,7 +54,8 @@ class PEWPEWDIEBEEPBOOP:
 
         def in_boundary(row, col):
             return 0 <= row < memory['size'][1] \
-                and 0 <= col < memory['size'][0]
+                and 0 <= col < memory['size'][0] \
+                and explored[row][col] != WALL
 
         def resolve(row, col, direction):
             remainder = row % 2
@@ -60,16 +66,13 @@ class PEWPEWDIEBEEPBOOP:
                 return (new_row, new_col)
             else: return (row, col)
 
-
         heatmap = []
-        width, height = memory['size']
-        explored = memory['explored']
         us = []
         them = []
         ours = []
         theirs = []
         freebies = []
-        unexplored = set()
+        unexplored = []
         for row in range(height):
             heatmap.append([])
             for col in range(width):
@@ -78,8 +81,8 @@ class PEWPEWDIEBEEPBOOP:
                 if g != -1: # Explored!
                     explored[row][col] = g
                     if g < 9:
-                        continue
-                    if g == 9:
+                        pass
+                    elif g == 9:
                         freebies.append((row, col))
                     elif g - 10 == pid:
                         ours.append((row, col))
@@ -94,67 +97,78 @@ class PEWPEWDIEBEEPBOOP:
                         them.append((row, col))
 
                 if explored[row][col] == -1:
-                    unexplored.add((row, col))
+                    unexplored.append((row, col))
+
         def _(x, denominator):
             return math.exp(-x**2./denominator)
         # Capture all freebies
-        visited = {}
         for freebie_row, freebie_col in freebies:
+            visited = [[-1] * width for i in range(height)]
             q = deque()
             q.append((freebie_row, freebie_col))
-            visited[(freebie_row, freebie_col)] = 0
-            while not q:
+            visited[freebie_row][freebie_col] = 0
+            while q:
                 row, col = q.popleft()
-                distance = visited[(row, col)]
+                distance = visited[row][col]
                 heatmap[row][col] += _(distance, 1024.)
                 for direction in directions:
                     new_row, new_col = resolve(row, col, direction)
-                    if (new_row, new_col) not in visited:
-                        visited[(new_row, new_col)] = distance + 1
+                    if explored[new_row][new_col] != WALL \
+                        and visited[new_row][new_col] == -1:
+                        visited[new_row][new_col] = distance + 1
                         q.append((new_row, new_col))
 
-        visited = {}
         for unexplored_row, unexplored_col in unexplored:
+            visited = [[-1] * width for i in range(height)]
             q = deque()
             q.append((unexplored_row, unexplored_col))
-            visited[(unexplored_row, unexplored_col)] = 0
-            while not q:
+            visited[unexplored_row][unexplored_col] = 0
+            while q:
                 row, col = q.popleft()
-                distance = visited[(row, col)]
+                distance = visited[row][col]
                 heatmap[row][col] += _(distance, 256.)
+                assert heatmap[row][col] > 0., 'wtf?'
                 for direction in directions:
                     new_row, new_col = resolve(row, col, direction)
-                    if (new_row, new_col) not in visited:
-                        visited[(new_row, new_col)] = distance + 1
+                    if explored[new_row][new_col] != WALL \
+                        and visited[new_row][new_col] == -1:
+                        visited[new_row][new_col] = distance + 1
                         q.append((new_row, new_col))
 
-        visited = {}
         for their_row, their_col in theirs:
+            visited = [[-1] * width for i in range(height)]
             q = deque()
             q.append((their_row, their_col))
-            visited[(their_row, their_col)] = 0
-            while not q:
+            visited[their_row][their_col] = 0
+            while q:
                 row, col = q.popleft()
-                distance = visited[(row, col)]
+                distance = visited[row][col]
                 heatmap[row][col] += _(distance, 64.)
                 for direction in directions:
                     new_row, new_col = resolve(row, col, direction)
-                    if (new_row, new_col) not in visited:
-                        visited[(new_row, new_col)] = distance + 1
+                    if explored[new_row][new_col] != WALL \
+                        and visited[new_row][new_col] == -1:
+                        visited[new_row][new_col] = distance + 1
                         q.append((new_row, new_col))
-
         results = []
         # Your code here!
         final_position = set()
         for unit_row, unit_col, unit_id in us:
             direction_max = 'na'
+            row_max = unit_row
+            col_max = unit_col
             max_heat = -1e99
             for direction in directions:
                 new_row, new_col = resolve(unit_row, unit_col, direction)
                 if (new_row, new_col) not in final_position \
+                    and explored[new_row][new_row] != WALL \
                     and heatmap[new_row][new_col] > max_heat:
                     max_heat = heatmap[new_row][new_col]
+                    row_max = new_row
+                    col_max = new_col
                     direction_max = direction
+            final_position.add((row_max, col_max))
             results.append(Movement(unit_id, direction_mapper[direction_max]))
+        print '%.9fs' % (time.time() - start_time)
         return results
 
