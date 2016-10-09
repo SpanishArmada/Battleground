@@ -18,6 +18,8 @@ var ws = new WebSocket("ws://localhost:8888/ws");
             }
             if(data.type == 1) {
                 replayData = JSON.parse(data.jsonData)
+                document.getElementById("algo1").innerHTML = data.algo1
+                document.getElementById("algo2").innerHTML = data.algo2
                 playReplay()
             }
         };
@@ -235,6 +237,10 @@ var playReplay = function () {
     replayData.turnData.forEach(function (objects, index) {
         setTimeout(function() {
             drawMap(objects);
+            document.getElementById('HiveScore1').innerHTML = objects.hiveScore[0];
+            document.getElementById('HiveScore2').innerHTML = objects.unitScore[0];
+            document.getElementById('UnitScore1').innerHTML = objects.hiveScore[1];
+            document.getElementById('UnitScore2').innerHTML = objects.unitScore[1];
         }, index * drawInterval + drawInterval);
     })
 }

@@ -89,7 +89,9 @@ class SocketHandler(tornado.websocket.WebSocketHandler):
             fileName = "testtest1.txt"
             with open(replayPath + fileName) as json_data:
                 result = json.load(json_data)
-            data = {"type": 1, "jsonData": json.dumps(result)}
+            al1 = "test.py"
+            al2 = "test1.py"
+            data = {"type": 1, "jsonData": json.dumps(result), "algo1": al1, "algo2": al2}
             self.write_message(data)
         elif(msg_type == 1):
             print("Removed: ", incoming_data["client_id"])
@@ -110,7 +112,7 @@ class SocketHandler(tornado.websocket.WebSocketHandler):
             else:
                 with open(replayPath + fileName) as json_data:
                     result = json.load(json_data)
-            data = {"type": 1, "jsonData": json.dumps(result)}
+            data = {"type": 1, "jsonData": json.dumps(result), "algo1": algoList[0], "algo2": algoList[1]}
             self.write_message(data)
 
     def on_close(self):
