@@ -24,26 +24,26 @@ class exploreBeforeAttack:
         width, height = memory['size']
         explored = memory['explored']
         explore_targets = [
-            (width - LOS, height - LOS),
-            (LOS, height - LOS),
-            (width - LOS, LOS),
+            # (int(0.10*height), int(0.10*width)),
+            # (int(0.10*height), int(0.5*width)),
+            # (int(0.10*height), int(0.9*width)),
+            # (int(0.5*height), int(0.10*width)),
+            # (int(0.5*height), int(0.5*width)),
+            # (int(0.5*height), int(0.9*width)),
+            # (int(0.9*height), int(0.10*width)),
+            # (int(0.9*height), int(0.5*width)),
+            # (int(0.9*height), int(0.9*width)),
             (LOS, LOS),
-
-            # (3, 4),
-            # (3, 9),
-            # (3, 15),
-            # (3, 23),
-            # (3, 27),
-            # (15, 2),
-            # (15, 9),
-            # (15, 15),
-            # (15, 23),
-            # (15, 27),
-            # (26, 4),
-            # (26, 9),
-            # (26, 15),
-            # (26, 23),
-            # (26, 27),
+            (LOS, width / 2),
+            (LOS, width - LOS),
+            (height / 2, LOS),
+            (height / 2, width / 2),
+            (height / 2, width - LOS),
+            (height - LOS, LOS),
+            (height - LOS, width / 2),
+            (height - LOS, width - LOS),
+            (height / 2, 2),
+            (height / 2, width - 3),
             ]
 
         UNEXPLORED = -1
@@ -102,17 +102,17 @@ class exploreBeforeAttack:
             for col in range(width):
                 heatmap[row].append(0.)
                 g = grids[row][col]
-
                 if g != -1: # Explored!
                     explored[row][col] = g
-                    if g < 9:
-                        pass
-                    elif g == 9:
-                        freebies.append((row, col))
-                    elif g - 10 == pid:
-                        ours.append((row, col))
-                    else:
-                        theirs.append((row, col))
+                e = explored[row][col]
+                if e < 9:
+                    pass
+                elif e == 9:
+                    freebies.append((row, col))
+                elif e - 10 == pid:
+                    ours.append((row, col))
+                else:
+                    theirs.append((row, col))
 
                 u = units[row][col]
                 if not isinstance(u, int): # Is not a unit!
@@ -121,7 +121,7 @@ class exploreBeforeAttack:
                     else:
                         them.append((row, col))
 
-                if explored[row][col] == -1:
+                if e == -1:
                     unexplored.append((row, col))
 
         def _(x, denominator):
@@ -150,7 +150,8 @@ class exploreBeforeAttack:
 
         # for unexplored_row, unexplored_col in unexplored:
         for target_row, target_col in explore_targets:
-            if explored[target_row][target_col] != UNEXPLORED:
+            if explored[target_row][target_col] != UNEXPLORED \
+                or explored[target_row][target_col] == WALL:
                 continue
 
             visited = [[-1] * width for i in range(height)]
@@ -160,8 +161,8 @@ class exploreBeforeAttack:
             while q:
                 row, col = q.popleft()
                 distance = visited[row][col]
-                heatmap[row][col] += _(distance, 256.)
-                # heatmap[row][col] += ___(distance)
+                # heatmap[row][col] += _(distance, 256.)
+                heatmap[row][col] += ___(distance)
                 for direction in directions:
                     new_row, new_col = resolve(row, col, direction)
                     if explored[new_row][new_col] != WALL \
@@ -215,5 +216,6 @@ class exploreBeforeAttack:
                     direction_max = direction
             final_position.add((row_max, col_max))
             results.append(Movement(unit_id, direction_mapper[direction_max]))
+        print explored[height / 2][LOS]
         print '%.9fs' % (time.time() - start_time)
         return results
