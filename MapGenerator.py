@@ -183,3 +183,17 @@ def getMap2(row, col):
     addPlus(grids, row - 13, col - 13, 9)
     addFort(grids, getPercentile(0, row, 0.5), getPercentile(0, col, 0.5), 1, [1, 1, 1, 1])
     return grids
+
+
+def getMap3(row,col):
+    grids = [[C.NON_WALL for i in range(col)] for j in range(row)]
+    middleRow = (row//2)
+
+    addHive(grids, middleRow,   2,            0, False)  #player 0
+    addHive(grids, middleRow,   col - 2 - 1,  1, False)  #player 1
+    addHive(grids, 2,           5,           -1, False)  #not taken
+    addHive(grids, row - 2 - 1, 5,           -1, False)  #not taken
+    addHive(grids, 2,           col - 5 - 1, -1, False)  #not taken
+    addHive(grids, row - 2 - 1, col - 5 - 1, -1, False)  #not taken
+    # addType4(grids, row, col, 5)
+    return grids

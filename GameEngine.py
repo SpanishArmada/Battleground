@@ -14,7 +14,7 @@ import traceback
 class GameEngine:
 
     # Init function
-    def __init__(self, col = 50, row = 50, playerNum = 2):
+    def __init__(self, row = 50, col = 50, playerNum = 2):
         self.row = row
         self.col = col
         self.playerNum = playerNum
