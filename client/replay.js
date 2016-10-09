@@ -2,6 +2,8 @@
 
 /* http://stackoverflow.com/a/14388512 */
 var replayData = null;
+var algo1 = null;
+var algo2 = null;
 var ws = new WebSocket("ws://localhost:8888/ws");
     var client_id;
     ws.onopen = function() {
@@ -17,6 +19,8 @@ var ws = new WebSocket("ws://localhost:8888/ws");
             replayData = JSON.parse(data.jsonData)
             document.getElementById("algo1").innerHTML = data.algo1
             document.getElementById("algo2").innerHTML = data.algo2
+            algo1 = data.algo1
+            algo2 = data.algo2
             playReplay()
         }
 
@@ -55,7 +59,8 @@ var gridProperties = {
     fogColor: '#666666',
     width: 16,
     height: 16,
-    spacing: 2,
+    hspacing: 2,
+    vspacing: 0,
     EMPTY: 0,
     WALL: 1,
     HIVE: 9,
@@ -86,6 +91,8 @@ var mapHeight = 30;
 var map = [];
 
 var directions = ['ne', 'e', 'se','sw', 'w', 'nw'];
+var hexagondx = [0, 8, 16, 16, 8, 0];
+var hexagondy = [3.3, -1.3, 3.3, 12.5, 17.1, 12.5]
 var resolution = [
     {
         'ne': [-1, 0],
@@ -128,9 +135,9 @@ var resolveCoordinate = function (row, col) {
      * Return relative top-left coordinate (x, y)
      */
     if(row % 2 === 0) {
-        return [col * gridProperties.width + col * gridProperties.spacing, row * gridProperties.height + row * gridProperties.spacing]
+        return [col * gridProperties.width + col * gridProperties.hspacing, row * gridProperties.height + row * gridProperties.vspacing]
     } else {
-        return [col * gridProperties.width + col * gridProperties.spacing + gridProperties.width / 2, row * gridProperties.height + row * gridProperties.spacing]
+        return [col * gridProperties.width + col * gridProperties.hspacing + (gridProperties.width+gridProperties.hspacing) / 2 , row * gridProperties.height + row * gridProperties.vspacing]
     }
 }
 
@@ -153,7 +160,15 @@ var drawEmpty = function (row, col) {
     var y1 = topLeft[1] + relativeCoordinate[1];
     ctx.save();
     ctx.fillStyle = gridProperties.dirtColor;
-    ctx.fillRect(x1, y1, gridProperties.width, gridProperties.height);
+    ctx.beginPath();
+    ctx.moveTo(x1 + hexagondx[0], y1 + hexagondy[0]);
+    ctx.lineTo(x1 + hexagondx[1], y1 + hexagondy[1]);
+    ctx.lineTo(x1 + hexagondx[2], y1 + hexagondy[2]);
+    ctx.lineTo(x1 + hexagondx[3], y1 + hexagondy[3]);
+    ctx.lineTo(x1 + hexagondx[4], y1 + hexagondy[4]);
+    ctx.lineTo(x1 + hexagondx[5], y1 + hexagondy[5]);
+    ctx.closePath();
+    ctx.fill();
     ctx.restore();
 }
 
@@ -163,7 +178,15 @@ var drawWall = function (row, col) {
     var y1 = topLeft[1] + relativeCoordinate[1];
     ctx.save();
     ctx.fillStyle = gridProperties.wallColor;
-    ctx.fillRect(x1, y1, gridProperties.width, gridProperties.height);
+     ctx.beginPath();
+    ctx.moveTo(x1 + hexagondx[0], y1 + hexagondy[0]);
+    ctx.lineTo(x1 + hexagondx[1], y1 + hexagondy[1]);
+    ctx.lineTo(x1 + hexagondx[2], y1 + hexagondy[2]);
+    ctx.lineTo(x1 + hexagondx[3], y1 + hexagondy[3]);
+    ctx.lineTo(x1 + hexagondx[4], y1 + hexagondy[4]);
+    ctx.lineTo(x1 + hexagondx[5], y1 + hexagondy[5]);
+    ctx.closePath();
+    ctx.fill();
     ctx.restore();
 }
 
@@ -176,7 +199,15 @@ var drawHive = function (row, col, playerId) {
     var yCenter = topLeft[1] + relativeCoordinate[1] + gridProperties.height / 2;
     ctx.save();
     ctx.fillStyle = gridProperties.dirtColor;
-    ctx.fillRect(x1, y1, gridProperties.width, gridProperties.height);
+    ctx.beginPath();
+    ctx.moveTo(x1 + hexagondx[0], y1 + hexagondy[0]);
+    ctx.lineTo(x1 + hexagondx[1], y1 + hexagondy[1]);
+    ctx.lineTo(x1 + hexagondx[2], y1 + hexagondy[2]);
+    ctx.lineTo(x1 + hexagondx[3], y1 + hexagondy[3]);
+    ctx.lineTo(x1 + hexagondx[4], y1 + hexagondy[4]);
+    ctx.lineTo(x1 + hexagondx[5], y1 + hexagondy[5]);
+    ctx.closePath();
+    ctx.fill();
     ctx.lineWidth = hiveProperties.border;
     ctx.fillStyle = '#000000';
     ctx.strokeStyle = hiveProperties.color[playerId];
@@ -232,6 +263,7 @@ var playReplay = function () {
     map = replayData.map;
     drawMap();
     var drawInterval = 450;
+    console.log(replayData.turnData.length)
     replayData.turnData.forEach(function (objects, index) {
         setTimeout(function() {
             drawMap(objects);
@@ -239,8 +271,19 @@ var playReplay = function () {
             document.getElementById('HiveScore2').innerHTML = objects.unitScore[0];
             document.getElementById('UnitScore1').innerHTML = objects.hiveScore[1];
             document.getElementById('UnitScore2').innerHTML = objects.unitScore[1];
+            if(replayData.turnData.length - 1 == index) {
+                document.getElementById('Result').style.visibility = "visible";
+                if(replayData.winnerData[0] == 0) {
+                    document.getElementById('Result').innerHTML = algo1 + " Wins by " + replayData.winnerData[1];
+                }
+                else {
+                    document.getElementById('Result').innerHTML = algo2 + " Wins by " + replayData.winnerData[1];
+                }
+            }
         }, index * drawInterval + drawInterval);
     })
+    
+    
 }
 
 var test = (function () {

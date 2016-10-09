@@ -2,6 +2,8 @@
 
 /* http://stackoverflow.com/a/14388512 */
 var replayData = null;
+var algo1 = null;
+var algo2 = null;
 var ws = new WebSocket("ws://localhost:8888/ws");
         var client_id;
         console.log("INSIDE simulation")
@@ -20,6 +22,8 @@ var ws = new WebSocket("ws://localhost:8888/ws");
                 replayData = JSON.parse(data.jsonData)
                 document.getElementById("algo1").innerHTML = data.algo1
                 document.getElementById("algo2").innerHTML = data.algo2
+                algo1 = data.algo1
+                algo2 = data.algo2
                 playReplay()
             }
         };
@@ -264,9 +268,18 @@ var playReplay = function () {
         setTimeout(function() {
             drawMap(objects);
             document.getElementById('HiveScore1').innerHTML = objects.hiveScore[0];
-            document.getElementById('HiveScore2').innerHTML = objects.unitScore[0];
-            document.getElementById('UnitScore1').innerHTML = objects.hiveScore[1];
+            document.getElementById('HiveScore2').innerHTML = objects.hiveScore[1];
+            document.getElementById('UnitScore1').innerHTML = objects.unitScore[0];
             document.getElementById('UnitScore2').innerHTML = objects.unitScore[1];
+            if(replayData.turnData.length - 1 == index) {
+                document.getElementById('Result').style.visibility = "visible";
+                if(replayData.winnerData[0] == 0) {
+                    document.getElementById('Result').innerHTML = algo1 + " Wins by " + replayData.winnerData[1];
+                }
+                else {
+                    document.getElementById('Result').innerHTML = algo2 + " Wins by " + replayData.winnerData[1];
+                }
+            }
         }, index * drawInterval + drawInterval);
     })
 }
