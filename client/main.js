@@ -56,7 +56,7 @@ var topLeft = [51, 51];
 // var bgColor = '#789030';
 var bgColor = '#000000';
 var gridProperties = {
-    dirtColor: '#703500',
+    dirtColor: '#402000',
     wallColor: '#000000',
     fogColor: '#666666',
     width: 16,
