@@ -20,13 +20,14 @@ class PEWPEWDIEBEEPBOOP:
                 width = len(grids[0])
                 memory['size'] = (width, height)
         init_memory()
+        LOS = 3
         width, height = memory['size']
         explored = memory['explored']
         explore_targets = [
-            (0, 0),
-            (0, height),
-            (width, 0),
-            (width, height),
+            (width - LOS, height - LOS),
+            (LOS, height - LOS),
+            (width - LOS, LOS),
+            (LOS, LOS),
 
             # (3, 4),
             # (3, 9),
