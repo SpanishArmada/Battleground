@@ -104,15 +104,17 @@ class SocketHandler(tornado.websocket.WebSocketHandler):
             self.write_message(data)
         elif(msg_type == 3):
             fileName = algoList[0][:-3] + algoList[1][:-3] + '.txt'
-            result = None
+            data = None
             if (not fileName in [f for f in listdir(replayPath) if (isfile(join(replayPath, f)) and splitext(f)[1] == '.txt')]):
                 result = GE.Start(getMap2(30, 30), algoList)
                 with open(replayPath + fileName, 'w+') as outfile:
                     outfile.write(result)
+                data = {"type": 1, "jsonData": result, "algo1": algoList[0], "algo2": algoList[1]}
             else:
                 with open(replayPath + fileName) as json_data:
                     result = json.load(json_data)
-            data = {"type": 1, "jsonData": json.dumps(result), "algo1": algoList[0], "algo2": algoList[1]}
+                data = {"type": 1, "jsonData": json.dumps(result), "algo1": algoList[0], "algo2": algoList[1]}
+            
             self.write_message(data)
 
     def on_close(self):
