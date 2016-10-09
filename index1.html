@@ -14,16 +14,30 @@
         <div id="game-info">Source code: <a href="https://github.com/SpanishArmada/Battleground">Our Code Here!</a>
         </div>
     </header>
-<form method="POST" action="upload" enctype="multipart/form-data">
-            <h3 style="margin:5px">Upload Your AI Code Here:</h3>
-                
-            <input type="file" name="code1" style="margin:5px"/>
-            <input type="submit" value="Upload" class="btn btn-default" style="margin:5px"/>
+    <div class="block h-center v-center">
+        <form method="POST" action="upload" enctype="multipart/form-data" style="display: inline">
+                    <h3 style="margin:5px">Upload Your AI Code Here:</h3>
+                        
+                    <input type="file" name="code1" align="center" style="margin-left:40%;"/>
+                    <input type="submit" value="Upload" class="btn btn-default" style="margin:5px"/>
+                </form>
+        <form method="POST" action="skipUpload" enctype="multipart/form-data" style="display: inline">
+        <input type="submit" value="Skip" class="btn btn-default" style="margin:5px"/>
         </form>
-<form method="POST" action="skipUpload" enctype="multipart/form-data">
-<input type="submit" value="Skip" class="btn btn-default" style="margin:5px"/>
-</form>
-<canvas id="canvas"></canvas>
+    </div>
+    <br/>
+<div>
+    <br/>
+<div class="block h-center v-center" style="height: auto;">
+    <div id="HiveScore1" style="display:inline">0</div>
+    <div id="UnitScore1" style="display:inline">0</div>
+    <div id="HiveScore2" style="display:inline">0</div>
+    <div id="UnitScore2" style="display:inline">0</div>
+</div>
+<div style="width: 100%">
+    <canvas id="canvas"></canvas>
+</div>
+</div>
 <script type="text/javascript" src={{ static_url("replay.js") }}></script>
 </body>
 </html>

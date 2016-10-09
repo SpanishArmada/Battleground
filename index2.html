@@ -54,17 +54,18 @@
         <div id="game-info">Source code: <a href="https://github.com/SpanishArmada/Battleground">Our Code Here!</a>
         </div>
     </header>
-    Upload Successful!
-    <form id="algoForm" method="POST" action="simulate" enctype="multipart/form-data" class="form-dropdown">
-        First Algorithm
-    <select id="algo1" name="algo1" class="form-dropdown">
-    </select>
-
-        Second Algorithm
-    <select id="algo2" name="algo2">      
-    </select>
-    <input type="submit" value="Submit" class="btn btn-default" style="margin:5px"/>
-    
+    <div class="block h-center v-center">
+        <form id="algoForm" method="POST" action="simulate" enctype="multipart/form-data" class="form-dropdown">
+            <h3 style="display:inline">First Algorithm</h3>
+        <select id="algo1" name="algo1" class="form-dropdown">
+        </select></br>
+        <h3>Vs</h3>
+            <h3 style="display:inline">Second Algorithm</h3>
+        <select id="algo2" name="algo2">      
+        </select>
+        <br/><br/>
+        <input type="submit" value="Go!" class="btn btn-default" style="margin:5px"/>
+    </div>
     </form>
     </body>
 </html>

@@ -233,6 +233,10 @@ var playReplay = function () {
     replayData.turnData.forEach(function (objects, index) {
         setTimeout(function() {
             drawMap(objects);
+            document.getElementById('HiveScore1').innerHTML = 5;
+            document.getElementById('HiveScore2').innerHTML = 5;
+            document.getElementById('UnitScore1').innerHTML = 5;
+            document.getElementById('UnitScore2').innerHTML = 5;
         }, index * drawInterval + drawInterval);
     })
 }
