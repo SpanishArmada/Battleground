@@ -1,5 +1,5 @@
 from GameConstant import GameConstant as C
-
+from HexagridHelper import *
 def addHive(grids, row, col, playerId, fort):
     grids[row][col] = C.PLAYER_HIVE + playerId
     if(fort):
@@ -149,6 +149,21 @@ def addPlus(grids, row, col, size):
             else:
                 grids[i][j] = C.WALL
         iCounter += 1
+def addCross(grids, row, col, size):
+    x = row
+    y = col
+    for i in range (size):
+        grids[x][y] = C.WALL
+        x, y = GetMoveTarget(x, y, DOWNRIGHT)
+    
+    for i in range ((size - 1) // 2):
+        row, col = GetMoveTarget(row, col, DOWNRIGHT)
+        row, col = GetMoveTarget(row, col, DOWNLEFT)
+    x = row
+    y = col
+    for i in range (size):
+        grids[x][y] = C.WALL
+        x, y = GetMoveTarget(x, y, UPPERRIGHT)
 
 def getMap(row, col):
     grids = [[C.NON_WALL for i in range(row)] for j in range(col)]
@@ -196,4 +211,11 @@ def getMap3(row,col):
     addHive(grids, 2,           col - 5 - 1, -1, False)  #not taken
     addHive(grids, row - 2 - 1, col - 5 - 1, -1, False)  #not taken
     # addType4(grids, row, col, 5)
+    # addCross(grids, 12, 12, 7)
+    addCross(grids, getPercentile(0, row, 0.4), getPercentile(0, col, 0.4), 12)
+    addType4(grids, row, col, 5)
+    addType3(grids, 0, getPercentile(0, row, 0.25), getPercentile(0, col, 0.25), getPercentile(0, col, 0.45), 1)
+    addType3(grids, getPercentile(0, row, 0.75), row - 1, getPercentile(0, col, 0.65), getPercentile(0, col, 0.85), 1)
+    addFort(grids, getPercentile(0, row, 0.3), getPercentile(0, col, 0.7), 1, [1, 1, 1, 1])
+    addFort(grids, getPercentile(0, row, 0.7), getPercentile(0, col, 0.3), 1, [1, 1, 1, 1])
     return grids
