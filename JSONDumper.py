@@ -12,20 +12,31 @@ import json
 #                   hiveDetails: [row, col, owner ID] (-1 for no owner)
 #               deadData: list of dead details, positions where units died in this turn
 #                   deadDetails: [row, col, owner ID] (100 for multiple owners' units death)
+#               hiveScore: list 0..playernum (int) of no. of hives they control
+#               unitScore: list 0..playernum (int) of no. of hives they control
+#       winner: [int playerId, string winningReason] denoting victor and reason behind victory. PlayerId = -1 if tied
+#
 #   example:
 #   {
 #       map: [[0,0,0,0][0,1,1,0][9,0,0,9]]
 #       turnData:
 #           [
 #               {
-#                   unitData: [[0,0,1], [2,2,5], [4,0,0]]
+#                   unitData: [[0,0,1], [2,2,0], [4,0,0]]
 #                   baseData: [[5,5,0], [10,5,1], [9,9,-1]]
+#                   deadData: [[7,7,0], [7,8,1]]
+#                   hiveScore: [1,1]
+#                   unitScore: [2,1]
 #               },
 #               {
-#                   unitData: [[0,1,1], [2,3,5], [4,1,0]]
-#                   baseData: [[5,5,0], [10,5,1], [9,9,-1]]
+#                   unitData: [[0,1,1], [2,3,1], [4,1,0]]
+#                   baseData: [[5,5,0], [10,5,1], [9,9,0]]
+#                   deadData: []
+#                   hiveScore: [0,1]
+#                   unitScore: [1,2]
 #               },
 #           ]
+#       winner: [0, "by Wipeout"]
 #   }
 
 class JSONDumper:
@@ -36,7 +47,7 @@ class JSONDumper:
         self.data["map"] = terrainMap
         self.turnData = []
 
-    def Update(self, unitDictionary, hiveList, gridDeathPos):
+    def Update(self, unitDictionary, hiveList, gridDeathPos, hiveScore, unitScore):
         newUnitList = []
         for key in unitDictionary.keys():
             pid = unitDictionary[key].GetPlayerID()
@@ -62,7 +73,12 @@ class JSONDumper:
         newTurnData["unitData"] = newUnitList
         newTurnData["baseData"] = newHiveList
         newTurnData["deadData"] = newDeadList
+        newTurnData["hiveScore"] = hiveScore
+        newTurnData["unitScore"] = unitScore
         self.turnData.append(newTurnData)
+
+    def SetWinner(self, playerID, winReason):
+        self.data["winnerData"] = [playerID, winReason]
 
     def GetDump(self):
         self.data["turnData"] = self.turnData
