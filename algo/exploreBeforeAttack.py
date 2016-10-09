@@ -216,6 +216,6 @@ class exploreBeforeAttack:
                     direction_max = direction
             final_position.add((row_max, col_max))
             results.append(Movement(unit_id, direction_mapper[direction_max]))
-        print explored[height / 2][LOS]
-        print '%.9fs' % (time.time() - start_time)
+        # print explored[height / 2][LOS]
+        # print '%.9fs' % (time.time() - start_time)
         return results
