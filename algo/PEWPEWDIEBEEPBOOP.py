@@ -202,6 +202,7 @@ class PEWPEWDIEBEEPBOOP:
                 if (new_row, new_col) not in final_position \
                     and explored[new_row][new_row] != WALL \
                     and heatmap[new_row][new_col] > max_heat:
+                    print 'Update!'
                     max_heat = heatmap[new_row][new_col]
                     row_max = new_row
                     col_max = new_col
@@ -211,4 +212,3 @@ class PEWPEWDIEBEEPBOOP:
             results.append(Movement(unit_id, direction_mapper[direction_max]))
         print '%.9fs' % (time.time() - start_time)
         return results
-
