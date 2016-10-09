@@ -10,7 +10,7 @@ class keepmovingforward:
         self.grids = grids
         self.maxrow = len(units)
         self.maxcol = len(units[0])
-        self.isOccupied = [[False for i in range(maxcol)] for j in range(maxrow)]
+        self.isOccupied = [[False for i in range(self.maxcol)] for j in range(self.maxrow)]
         results = []
         counter = 0
         for i in range(self.maxcol-1,-1,-1):
