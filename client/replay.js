@@ -3,30 +3,28 @@
 /* http://stackoverflow.com/a/14388512 */
 var replayData = null;
 var ws = new WebSocket("ws://localhost:8888/ws");
-        var client_id;
-        console.log("INSIDE simulation")
-        ws.onopen = function() {
-            console.log("Connection open")
-            ws.send(JSON.stringify({type: 3}));
-        };
-        ws.onmessage = function (evt) {
-            console.log(evt)
-            console.log(evt.data)
-            var data = JSON.parse(evt.data);
-            if(data.type == 0) {
-                client_id = data.client_id; 
-            }
-            if(data.type == 1) {
-                replayData = JSON.parse(data.jsonData)
-                playReplay()
-            }
-        };
+    var client_id;
+    ws.onopen = function() {
+        // pass row and col here
+        ws.send(JSON.stringify({type: 0}));
+    };
+    ws.onmessage = function (evt) {
+        var data = JSON.parse(evt.data);
+        if(data.type == 0) {
+            client_id = data.client_id; 
+        }
+        else if(data.type == 1) {
+            replayData = JSON.parse(data.jsonData)
+            playReplay()
+        }
 
-        window.onbeforeunload = function() {
-            ws.send(JSON.stringify({type: 1, client_id: client_id}));
-            ws.onclose = function () {}; // disable onclose handler first
-            ws.close()
-        };
+    };
+
+    window.onbeforeunload = function() {
+        ws.send(JSON.stringify({type: 1, client_id: client_id}));
+        ws.onclose = function () {}; // disable onclose handler first
+        ws.close()
+    };
 
 var fetchJSONFile = function (path, callback) {
     var httpRequest = new XMLHttpRequest();
@@ -318,8 +316,4 @@ var test = (function () {
 document.addEventListener('DOMContentLoaded', function (event) {
     canvas.width = 640;
     canvas.height = 640;
-    // test.draw();
-    // test.unitMovementDraw();
-    // drawMap();
-    // playReplay();
 })

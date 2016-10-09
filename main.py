@@ -17,6 +17,7 @@ server = None
 counter = 0
 GE = None
 path = dirname(abspath(__file__)) + '\\' + "algo" + '\\'
+replayPath = dirname(abspath(__file__)) + '\\' + "replay" + '\\'
 def load_from_file(filepath, expectedClass):
     class_inst = None
 
@@ -83,7 +84,12 @@ class SocketHandler(tornado.websocket.WebSocketHandler):
         incoming_data = json.loads(msg)
         msg_type = incoming_data["type"]
         if(msg_type == 0):
-            data = {"type": 1}
+            
+            result = None
+            fileName = "testtest1.txt"
+            with open(replayPath + fileName) as json_data:
+                result = json.load(json_data)
+            data = {"type": 1, "jsonData": json.dumps(result)}
             self.write_message(data)
         elif(msg_type == 1):
             print("Removed: ", incoming_data["client_id"])
@@ -95,7 +101,6 @@ class SocketHandler(tornado.websocket.WebSocketHandler):
             data = {"type": 1, "algoList": get_algo()}
             self.write_message(data)
         elif(msg_type == 3):
-            replayPath = dirname(abspath(__file__)) + '\\' + "replay" + '\\'
             fileName = algoList[0][:-3] + algoList[1][:-3] + '.txt'
             result = None
             if (not fileName in [f for f in listdir(replayPath) if (isfile(join(replayPath, f)) and splitext(f)[1] == '.txt')]):
