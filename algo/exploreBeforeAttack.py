@@ -24,26 +24,15 @@ class exploreBeforeAttack:
         width, height = memory['size']
         explored = memory['explored']
         explore_targets = [
-            (width - LOS, height - LOS),
-            (LOS, height - LOS),
-            (width - LOS, LOS),
-            (LOS, LOS),
-
-            # (3, 4),
-            # (3, 9),
-            # (3, 15),
-            # (3, 23),
-            # (3, 27),
-            # (15, 2),
-            # (15, 9),
-            # (15, 15),
-            # (15, 23),
-            # (15, 27),
-            # (26, 4),
-            # (26, 9),
-            # (26, 15),
-            # (26, 23),
-            # (26, 27),
+            (int(0.125*height), int(0.125*width)),
+            (int(0.125*height), int(0.5*width)),
+            (int(0.125*height), int(0.875*width)),
+            (int(0.5*height), int(0.125*width)),
+            (int(0.5*height), int(0.5*width)),
+            (int(0.5*height), int(0.875*width)),
+            (int(0.875*height), int(0.125*width)),
+            (int(0.875*height), int(0.5*width)),
+            (int(0.875*height), int(0.875*width)),
             ]
 
         UNEXPLORED = -1
@@ -102,17 +91,17 @@ class exploreBeforeAttack:
             for col in range(width):
                 heatmap[row].append(0.)
                 g = grids[row][col]
-
                 if g != -1: # Explored!
                     explored[row][col] = g
-                    if g < 9:
-                        pass
-                    elif g == 9:
-                        freebies.append((row, col))
-                    elif g - 10 == pid:
-                        ours.append((row, col))
-                    else:
-                        theirs.append((row, col))
+                e = explored[row][col]
+                if e < 9:
+                    pass
+                elif e == 9:
+                    freebies.append((row, col))
+                elif e - 10 == pid:
+                    ours.append((row, col))
+                else:
+                    theirs.append((row, col))
 
                 u = units[row][col]
                 if not isinstance(u, int): # Is not a unit!
@@ -121,7 +110,7 @@ class exploreBeforeAttack:
                     else:
                         them.append((row, col))
 
-                if explored[row][col] == -1:
+                if e == -1:
                     unexplored.append((row, col))
 
         def _(x, denominator):
@@ -160,8 +149,8 @@ class exploreBeforeAttack:
             while q:
                 row, col = q.popleft()
                 distance = visited[row][col]
-                heatmap[row][col] += _(distance, 256.)
-                # heatmap[row][col] += ___(distance)
+                # heatmap[row][col] += _(distance, 256.)
+                heatmap[row][col] += ___(distance)
                 for direction in directions:
                     new_row, new_col = resolve(row, col, direction)
                     if explored[new_row][new_col] != WALL \
