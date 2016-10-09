@@ -7,7 +7,9 @@ from HexagridHelper import *
 
 class keepmovingforward:
     def getAction(self, pid, grids, units, memory):
+        self.pid = pid
         self.grids = grids
+        self.units = units
         self.maxrow = len(units)
         self.maxcol = len(units[0])
         self.isOccupied = [[False for i in range(self.maxcol)] for j in range(self.maxrow)]
@@ -40,4 +42,7 @@ class keepmovingforward:
             return False
         if (self.grids[coor[0]][coor[1]] == 1):
             return False
+        if (not isinstance(self.units[coor[0]][coor[1]], int)):
+            if (self.units[coor[0]][coor[1]].GetPlayerID() == self.pid):
+                return False
         return not self.isOccupied[coor[0]][coor[1]]
