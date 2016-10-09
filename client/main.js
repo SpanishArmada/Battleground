@@ -57,7 +57,8 @@ var gridProperties = {
     fogColor: '#666666',
     width: 16,
     height: 16,
-    spacing: 2,
+    hspacing: 2,
+    vspacing: 0,
     EMPTY: 0,
     WALL: 1,
     HIVE: 9,
@@ -86,8 +87,9 @@ var hiveProperties = {
 var mapWidth = 30;
 var mapHeight = 30;
 var map = [];
-
 var directions = ['ne', 'e', 'se','sw', 'w', 'nw'];
+var hexagondx = [0, 8, 16, 16, 8, 0];
+var hexagondy = [3.3, -1.3, 3.3, 12.5, 17.1, 12.5]
 var resolution = [
     {
         'ne': [-1, 0],
@@ -130,9 +132,9 @@ var resolveCoordinate = function (row, col) {
      * Return relative top-left coordinate (x, y)
      */
     if(row % 2 === 0) {
-        return [col * gridProperties.width + col * gridProperties.spacing, row * gridProperties.height + row * gridProperties.spacing]
+        return [col * gridProperties.width + col * gridProperties.hspacing, row * gridProperties.height + row * gridProperties.vspacing]
     } else {
-        return [col * gridProperties.width + col * gridProperties.spacing + gridProperties.width / 2, row * gridProperties.height + row * gridProperties.spacing]
+        return [col * gridProperties.width + col * gridProperties.hspacing + (gridProperties.width+gridProperties.hspacing) / 2 , row * gridProperties.height + row * gridProperties.vspacing]
     }
 }
 
@@ -155,7 +157,15 @@ var drawEmpty = function (row, col) {
     var y1 = topLeft[1] + relativeCoordinate[1];
     ctx.save();
     ctx.fillStyle = gridProperties.dirtColor;
-    ctx.fillRect(x1, y1, gridProperties.width, gridProperties.height);
+    ctx.beginPath();
+    ctx.moveTo(x1 + hexagondx[0], y1 + hexagondy[0]);
+    ctx.lineTo(x1 + hexagondx[1], y1 + hexagondy[1]);
+    ctx.lineTo(x1 + hexagondx[2], y1 + hexagondy[2]);
+    ctx.lineTo(x1 + hexagondx[3], y1 + hexagondy[3]);
+    ctx.lineTo(x1 + hexagondx[4], y1 + hexagondy[4]);
+    ctx.lineTo(x1 + hexagondx[5], y1 + hexagondy[5]);
+    ctx.closePath();
+    ctx.fill();
     ctx.restore();
 }
 
@@ -165,7 +175,15 @@ var drawWall = function (row, col) {
     var y1 = topLeft[1] + relativeCoordinate[1];
     ctx.save();
     ctx.fillStyle = gridProperties.wallColor;
-    ctx.fillRect(x1, y1, gridProperties.width, gridProperties.height);
+    ctx.beginPath();
+    ctx.moveTo(x1 + hexagondx[0], y1 + hexagondy[0]);
+    ctx.lineTo(x1 + hexagondx[1], y1 + hexagondy[1]);
+    ctx.lineTo(x1 + hexagondx[2], y1 + hexagondy[2]);
+    ctx.lineTo(x1 + hexagondx[3], y1 + hexagondy[3]);
+    ctx.lineTo(x1 + hexagondx[4], y1 + hexagondy[4]);
+    ctx.lineTo(x1 + hexagondx[5], y1 + hexagondy[5]);
+    ctx.closePath();
+    ctx.fill();
     ctx.restore();
 }
 
@@ -178,7 +196,15 @@ var drawHive = function (row, col, playerId) {
     var yCenter = topLeft[1] + relativeCoordinate[1] + gridProperties.height / 2;
     ctx.save();
     ctx.fillStyle = gridProperties.dirtColor;
-    ctx.fillRect(x1, y1, gridProperties.width, gridProperties.height);
+    ctx.beginPath();
+    ctx.moveTo(x1 + hexagondx[0], y1 + hexagondy[0]);
+    ctx.lineTo(x1 + hexagondx[1], y1 + hexagondy[1]);
+    ctx.lineTo(x1 + hexagondx[2], y1 + hexagondy[2]);
+    ctx.lineTo(x1 + hexagondx[3], y1 + hexagondy[3]);
+    ctx.lineTo(x1 + hexagondx[4], y1 + hexagondy[4]);
+    ctx.lineTo(x1 + hexagondx[5], y1 + hexagondy[5]);
+    ctx.closePath();
+    ctx.fill();
     ctx.lineWidth = hiveProperties.border;
     ctx.fillStyle = '#000000';
     ctx.strokeStyle = hiveProperties.color[playerId];
