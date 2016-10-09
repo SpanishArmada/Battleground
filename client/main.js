@@ -88,8 +88,8 @@ var hiveProperties = {
     border: 4,
 }
 
-var mapWidth = 30;
-var mapHeight = 30;
+var mapWidth = 33;
+var mapHeight = 29;
 var map = [];
 var directions = ['ne', 'e', 'se','sw', 'w', 'nw'];
 var hexagondx = [0, 8, 16, 16, 8, 0];
@@ -361,7 +361,7 @@ var test = (function () {
 })();
 
 document.addEventListener('DOMContentLoaded', function (event) {
-    canvas.width = 640;
+    canvas.width = 700;
     canvas.height = 640;
     // test.draw();
     // test.unitMovementDraw();

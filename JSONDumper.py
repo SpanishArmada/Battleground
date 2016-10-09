@@ -82,4 +82,5 @@ class JSONDumper:
 
     def GetDump(self):
         self.data["turnData"] = self.turnData
+        print(json.dumps(self.data))
         return json.dumps(self.data)

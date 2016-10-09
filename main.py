@@ -18,6 +18,9 @@ counter = 0
 GE = None
 path = dirname(abspath(__file__)) + '\\' + "algo" + '\\'
 replayPath = dirname(abspath(__file__)) + '\\' + "replay" + '\\'
+
+maxrow = 29
+maxcol = 33
 def load_from_file(filepath, expectedClass):
     class_inst = None
 
@@ -106,7 +109,7 @@ class SocketHandler(tornado.websocket.WebSocketHandler):
             fileName = algoList[0][:-3] + algoList[1][:-3] + '.txt'
             data = None
             if (not fileName in [f for f in listdir(replayPath) if (isfile(join(replayPath, f)) and splitext(f)[1] == '.txt')]):
-                result = GE.Start(getMap2(30, 30), algoList)
+                result = GE.Start(getMap3(maxrow, maxcol), algoList)
                 with open(replayPath + fileName, 'w+') as outfile:
                     outfile.write(result)
                 data = {"type": 1, "jsonData": result, "algo1": algoList[0], "algo2": algoList[1]}
@@ -151,7 +154,7 @@ def make_app():
 
 if __name__ == "__main__":
     global GE
-    GE = GameEngine(30, 30, 2)
+    GE = GameEngine(maxrow, maxcol, 2)
     app = make_app()
     app.listen(8888)
     tornado.ioloop.IOLoop.current().start()
