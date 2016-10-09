@@ -17,7 +17,9 @@ class GameConstant:
     # Game
     RESPAWN = 3
     ATTACK_RANGE = 1
-    VISION_RANGE = 5
+    VISION_RANGE = 3
+    VISION_RANGE_FOREST = 1
+    VISION_RANGE_TOWER = 6
     TURN_LIMIT = 100
 
     # FOW
