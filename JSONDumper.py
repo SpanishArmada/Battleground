@@ -81,6 +81,5 @@ class JSONDumper:
         self.data["winnerData"] = [playerID, winReason]
 
     def GetDump(self):
-        self.data["turnData"] = self.turnData
-        print(json.dumps(self.data))
+        self.data["turnData"] = self.turnData 
         return json.dumps(self.data)
