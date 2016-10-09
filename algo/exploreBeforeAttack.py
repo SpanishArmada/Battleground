@@ -24,15 +24,26 @@ class exploreBeforeAttack:
         width, height = memory['size']
         explored = memory['explored']
         explore_targets = [
-            (int(0.125*height), int(0.125*width)),
-            (int(0.125*height), int(0.5*width)),
-            (int(0.125*height), int(0.875*width)),
-            (int(0.5*height), int(0.125*width)),
-            (int(0.5*height), int(0.5*width)),
-            (int(0.5*height), int(0.875*width)),
-            (int(0.875*height), int(0.125*width)),
-            (int(0.875*height), int(0.5*width)),
-            (int(0.875*height), int(0.875*width)),
+            # (int(0.10*height), int(0.10*width)),
+            # (int(0.10*height), int(0.5*width)),
+            # (int(0.10*height), int(0.9*width)),
+            # (int(0.5*height), int(0.10*width)),
+            # (int(0.5*height), int(0.5*width)),
+            # (int(0.5*height), int(0.9*width)),
+            # (int(0.9*height), int(0.10*width)),
+            # (int(0.9*height), int(0.5*width)),
+            # (int(0.9*height), int(0.9*width)),
+            (LOS, LOS),
+            (LOS, width / 2),
+            (LOS, width - LOS),
+            (height / 2, LOS),
+            (height / 2, width / 2),
+            (height / 2, width - LOS),
+            (height - LOS, LOS),
+            (height - LOS, width / 2),
+            (height - LOS, width - LOS),
+            (height / 2, 2),
+            (height / 2, width - 3),
             ]
 
         UNEXPLORED = -1
@@ -139,7 +150,8 @@ class exploreBeforeAttack:
 
         # for unexplored_row, unexplored_col in unexplored:
         for target_row, target_col in explore_targets:
-            if explored[target_row][target_col] != UNEXPLORED:
+            if explored[target_row][target_col] != UNEXPLORED \
+                or explored[target_row][target_col] == WALL:
                 continue
 
             visited = [[-1] * width for i in range(height)]
@@ -204,5 +216,6 @@ class exploreBeforeAttack:
                     direction_max = direction
             final_position.add((row_max, col_max))
             results.append(Movement(unit_id, direction_mapper[direction_max]))
+        print explored[height / 2][LOS]
         print '%.9fs' % (time.time() - start_time)
         return results
